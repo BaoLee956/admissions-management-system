@@ -1,0 +1,20 @@
+{
+  "name": "admissions-management-system",
+  "private": true,
+  "version": "0.0.0",
+  "workspaces": [
+    "ui",
+    "src/main/admission_management_system"
+  ],
+  "scripts": {
+    "dev": "concurrently -n ui,api -c cyan,magenta \"npm run dev --prefix ui\" \"npm run dev --prefix src/main/admission_management_system\"",
+    "dev:ui": "npm run dev --prefix ui",
+    "dev:be": "npm run dev --prefix src/main/admission_management_system",
+    "build": "npm run build --prefix ui",
+    "preview": "npm run preview --prefix ui"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0"
+  }
+}
+

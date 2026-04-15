@@ -201,6 +201,21 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
+# Node / JS
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Vite / React build output
+ui/dist/
+ui/.vite/
+
+# General build output
+dist/
+build/
+
 # Marimo
 marimo/_static/
 marimo/_lsp/
