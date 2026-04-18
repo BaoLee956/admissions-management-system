@@ -4,9 +4,11 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('ThiSinh', {
-      id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true, allowNull: false },
-      createdAt: { type: Sequelize.DATE, allowNull: false, defaultValue: Sequelize.fn('NOW') },
-      updatedAt: { type: Sequelize.DATE, allowNull: false, defaultValue: Sequelize.fn('NOW') },
+      id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+      hoTen: Sequelize.STRING,
+      email: Sequelize.STRING,
+      createdAt: { type: Sequelize.DATE, defaultValue: Sequelize.NOW },
+      updatedAt: { type: Sequelize.DATE, defaultValue: Sequelize.NOW },
     });
   },
 

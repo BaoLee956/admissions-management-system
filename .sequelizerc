@@ -1,0 +1,15 @@
+const path = require('path');
+
+module.exports = {
+  config: path.join(
+    __dirname,
+    'src',
+    'main',
+    'admission_management_system',
+    'config',
+    'database.js'
+  ),
+  'migrations-path': path.join(__dirname, 'src', 'main', 'resources', 'db', 'migrations'),
+  'seeders-path': path.join(__dirname, 'src', 'main', 'resources', 'db', 'seeders'),
+  'models-path': path.join(__dirname, 'src', 'main', 'admission_management_system', 'models'),
+};
