@@ -3,8 +3,23 @@
 /** @type {import('sequelize-cli').Seeder} */
 module.exports = {
   async up(queryInterface) {
-    // TODO: replace with real seed data
-    await queryInterface.bulkInsert('NhomQuyen', [], {});
+    await queryInterface.bulkInsert('NhomQuyen', [
+      {
+        tenNhom: 'Admin',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        tenNhom: 'Officer',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        tenNhom: 'Candidate',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ], {});
   },
 
   async down(queryInterface) {
