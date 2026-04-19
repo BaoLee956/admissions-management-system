@@ -1,3 +1,12 @@
-export default function InputField() {
-  return <div>InputField</div>;
-}
+const InputField = ({ value, onChange, placeholder }) => {
+  return (
+    <input
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      className="border p-2 rounded w-full"
+    />
+  );
+};
+
+export default InputField;
