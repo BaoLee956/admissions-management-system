@@ -3,40 +3,31 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('CauTrucToHop', {
-      id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-        allowNull: false,
-      },
 
-      toHopId: {
+      maToHop: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        primaryKey: true,
         references: {
           model: 'ToHopMon',
-          key: 'id',
+          key: 'maToHop',
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
 
-      monHocId: {
+      maMon: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        primaryKey : true, 
         references: {
           model: 'MonHoc',
-          key: 'id',
+          key: 'maMon',
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
 
-      heSo: {
-        type: Sequelize.FLOAT,
-        allowNull: false,
-        defaultValue: 1,
-      },
 
       createdAt: {
         type: Sequelize.DATE,
@@ -53,7 +44,7 @@ module.exports = {
 
     // 🔥 unique composite (cực quan trọng)
     await queryInterface.addConstraint('CauTrucToHop', {
-      fields: ['toHopId', 'monHocId'],
+      fields: ['maToHop', 'maMon'],
       type: 'unique',
       name: 'unique_toHop_monHoc',
     });

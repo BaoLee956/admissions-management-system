@@ -3,18 +3,18 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('HoSoNhapHoc', {
-      id: {
+      maHoSo: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false,
       },
 
-      thiSinhId: {
+      sbd: {
         type: Sequelize.INTEGER,
         allowNull: false,
         unique: true, // 🔥 mỗi thí sinh 1 hồ sơ
-        references: { model: 'ThiSinh', key: 'id' },
+        references: { model: 'ThiSinh', key: 'sbd' },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },

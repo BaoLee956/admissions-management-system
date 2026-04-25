@@ -10,18 +10,18 @@ module.exports = {
         allowNull: false,
       },
 
-      nganhId: {
+      maNganh: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: 'Nganh', key: 'id' },
+        references: { model: 'Nganh', key: 'maNganh' },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
 
-      dotId: {
+      maDot: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: 'DotTuyenSinh', key: 'id' },
+        references: { model: 'DotTuyenSinh', key: 'maDot' },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
@@ -46,7 +46,7 @@ module.exports = {
 
     // 🔥 mỗi ngành mỗi đợt chỉ có 1 chỉ tiêu
     await queryInterface.addConstraint('ChiTieuTuyenSinh', {
-      fields: ['nganhId', 'dotId'],
+      fields: ['maNganh', 'maDot'],
       type: 'unique',
       name: 'unique_nganh_dot',
     });

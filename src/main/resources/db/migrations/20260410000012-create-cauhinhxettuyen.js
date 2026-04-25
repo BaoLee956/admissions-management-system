@@ -10,27 +10,28 @@ module.exports = {
         allowNull: false,
       },
 
-      dotId: {
+      maToHop: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: 'DotTuyenSinh', key: 'id' },
+        references: { model: 'ToHopMon', key: 'maToHop' },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
 
-      nganhId: {
+      maNganh: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: 'Nganh', key: 'id' },
+        references: { model: 'Nganh', key: 'maNganh' },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
-
-      moTa: {
-        type: Sequelize.STRING,
-        allowNull: true,
+      maDot: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: { model: 'DotTuyenSinh', key: 'maDot' },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
-
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -46,7 +47,7 @@ module.exports = {
 
     // 🔥 mỗi ngành mỗi đợt 1 config
     await queryInterface.addConstraint('CauHinhXetTuyen', {
-      fields: ['dotId', 'nganhId'],
+      fields: ['maNganh', 'maToHop', 'maDot'],
       type: 'unique',
       name: 'unique_config_dot_nganh',
     });

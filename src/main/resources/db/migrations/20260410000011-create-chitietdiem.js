@@ -10,29 +10,29 @@ module.exports = {
         allowNull: false,
       },
 
-      thiSinhId: {
+      sbd: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
           model: 'ThiSinh',
-          key: 'id',
+          key: 'sbd',
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
 
-      monHocId: {
+      maMon: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
           model: 'MonHoc',
-          key: 'id',
+          key: 'maMon',
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
 
-      diem: {
+      diemSo: {
         type: Sequelize.FLOAT,
         allowNull: false,
         validate: {
@@ -56,7 +56,7 @@ module.exports = {
 
     // mỗi thí sinh chỉ có 1 điểm / môn
     await queryInterface.addConstraint('ChiTietDiem', {
-      fields: ['thiSinhId', 'monHocId'],
+      fields: ['sbd', 'maMon'],
       type: 'unique',
       name: 'unique_thisinh_monhoc',
     });

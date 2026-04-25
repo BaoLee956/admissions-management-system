@@ -10,37 +10,31 @@ module.exports = {
         allowNull: false,
       },
 
-      hoSoId: {
+      maHoSo: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
           model: 'HoSoNhapHoc',
-          key: 'id',
+          key: 'maHoSo',
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
 
-      loaiGiayToId: {
+      maLoai: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
           model: 'LoaiGiayTo',
-          key: 'id',
+          key: 'maLoai',
         },
         onUpdate: 'CASCADE',
         onDelete: 'RESTRICT',
       },
 
-      url: {
+      duongDanFile: {
         type: Sequelize.STRING,
         allowNull: false,
-      },
-
-      trangThai: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        defaultValue: 'PENDING', // APPROVED / REJECTED
       },
 
       createdAt: {
@@ -58,7 +52,7 @@ module.exports = {
 
     // 🔥 mỗi hồ sơ chỉ có 1 giấy tờ mỗi loại
     await queryInterface.addConstraint('GiayToDinhKem', {
-      fields: ['hoSoId', 'loaiGiayToId'],
+      fields: ['maHoSo', 'maLoai'],
       type: 'unique',
       name: 'unique_hoso_loaigiayto',
     });

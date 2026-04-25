@@ -10,24 +10,24 @@ module.exports = {
         allowNull: false,
       },
 
-      hoSoId: {
+      maHoSo: {
         type: Sequelize.INTEGER,
         allowNull: false,
         unique: true, // 🔥 1 hồ sơ = 1 request active
         references: {
           model: 'HoSoNhapHoc',
-          key: 'id',
+          key: 'maHoSo',
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
 
-      nhanVienId: {
+      maNhanVien: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
           model: 'NhanVien',
-          key: 'id',
+          key: 'maNhanVien',
         },
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL',

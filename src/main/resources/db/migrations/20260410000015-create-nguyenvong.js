@@ -3,40 +3,54 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('NguyenVong', {
-      id: {
+      maNguyenVong: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false,
       },
 
-      thiSinhId: {
+      sbd: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: 'ThiSinh', key: 'id' },
+        references: { model: 'ThiSinh', key: 'sbd' },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
 
-      nganhId: {
+      maDot: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: 'Nganh', key: 'id' },
+        references: { model: 'DotTuyenSinh', key: 'maDot' },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
 
-      toHopId: {
+      maNganh: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: 'ToHopMon', key: 'id' },
+        references: { model: 'Nganh', key: 'maNganh' },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
 
-      thuTu: {
+      maToHop: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        references: { model: 'ToHopMon', key: 'maToHop' },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
+
+      thuTuUuTien: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
+
+      trangThai: {
+        type: Sequelize.ENUM('PENDING', 'APPROVED', 'REJECTED'),
+        allowNull: false,
+        defaultValue: 'PENDING',
       },
 
       createdAt: {
@@ -54,14 +68,14 @@ module.exports = {
 
     // 🔥 mỗi thí sinh chỉ có 1 thứ tự
     await queryInterface.addConstraint('NguyenVong', {
-      fields: ['thiSinhId', 'thuTu'],
+      fields: ['sbd', 'maDot', 'thuTuUuTien'],
       type: 'unique',
       name: 'unique_thisinh_thutu',
     });
 
     // 🔥 tránh đăng ký trùng ngành
     await queryInterface.addConstraint('NguyenVong', {
-      fields: ['thiSinhId', 'nganhId'],
+      fields: ['sbd', 'maDot', 'maNganh'],
       type: 'unique',
       name: 'unique_thisinh_nganh',
     });
