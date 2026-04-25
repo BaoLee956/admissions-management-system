@@ -3,14 +3,14 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('ToHopMon', {
-      id: {
+      maToHop: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false,
       },
 
-      tenToHop: {
+      moTa: {
         type: Sequelize.STRING,
         allowNull: false,
         unique: true, // 🔥 tránh trùng A00, A01

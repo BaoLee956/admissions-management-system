@@ -3,29 +3,40 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('SinhVien', {
-      id: {
-        type: Sequelize.INTEGER,
+
+      id: { // 🔥 UUID nội bộ
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
-        autoIncrement: true,
         allowNull: false,
       },
 
-      thiSinhId: {
+      MSSV: { // 🔥 MSSV hiển thị
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
+      },
+
+      maHoSo: {
         type: Sequelize.INTEGER,
         allowNull: false,
         unique: true,
         references: {
-          model: 'ThiSinh',
-          key: 'id',
+          model: 'HoSoNhapHoc',
+          key: 'maHoSo',
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
 
-      maSinhVien: {
+      lopSH: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: true, // 🔥 tránh trùng MSSV
+      },
+
+      namNhapHoc: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
       },
 
       createdAt: {

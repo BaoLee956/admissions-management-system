@@ -3,7 +3,7 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('NhomQuyen', {
-      id: {
+      maNhom: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
