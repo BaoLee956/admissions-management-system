@@ -1,7 +1,13 @@
-export default function App() {
+import CandidateLayout from "./components/layout/CandidateLayout";
+import Button from "./components/common/Button";
+
+function App() {
   return (
-    <div className="min-h-screen p-6">
-      <h1 className="text-2xl font-semibold">Admissions Management System</h1>
-    </div>
+    <CandidateLayout>
+      <h1>Trang chủ</h1>
+      <Button>Test</Button>
+    </CandidateLayout>
   );
 }
+
+export default App;
