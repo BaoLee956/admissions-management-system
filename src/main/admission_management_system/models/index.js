@@ -109,6 +109,17 @@ db.ToHopMon.hasMany(db.CauHinhXetTuyen, {
   onDelete: 'CASCADE',
 });
 
+db.CauHinhXetTuyen.belongsTo(db.DotTuyenSinh, {
+  foreignKey: 'maDot',
+  as: 'dotTuyenSinh',
+});
+// maDot.hasMany(CauHinhXetTuyen)
+db.DotTuyenSinh.hasMany(db.CauHinhXetTuyen, {
+  foreignKey: 'maDot',
+  as: 'cauHinhXetTuyens',
+  onUpdate: 'CASCADE',
+  onDelete: 'CASCADE',
+});
 // ========== 6. TO HOP MON <-> CAU TRUC TO HOP (1:M - Bao gồm) ==========
 // ToHopMon.hasMany(CauTrucToHop) - Tổ hợp môn bao gồm nhiều cấu trúc
 db.ToHopMon.hasMany(db.CauTrucToHop, {

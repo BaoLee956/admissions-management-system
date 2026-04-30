@@ -32,6 +32,12 @@ module.exports = function ThiSinhModel(sequelize, DataTypes) {
         unique: true,
       },
 
+      cccd: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+
       email: {
         type: DataTypes.STRING,
         allowNull: false,

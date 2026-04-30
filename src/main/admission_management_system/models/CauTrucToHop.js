@@ -1,7 +1,5 @@
 'use strict';
 
-const CauHinhXetTuyen = require("./CauHinhXetTuyen");
-
 module.exports = function CauTrucToHopModel(sequelize, DataTypes) {
   const CauTrucToHop = sequelize.define(
     'CauTrucToHop',
@@ -17,6 +15,7 @@ module.exports = function CauTrucToHopModel(sequelize, DataTypes) {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
+
       maMon: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -28,11 +27,13 @@ module.exports = function CauTrucToHopModel(sequelize, DataTypes) {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
+
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: DataTypes.NOW,
       },
+
       updatedAt: {
         type: DataTypes.DATE,
         allowNull: false,
@@ -42,19 +43,26 @@ module.exports = function CauTrucToHopModel(sequelize, DataTypes) {
     {
       tableName: 'CauTrucToHop',
       timestamps: true,
+
       indexes: [
         {
           unique: true,
-          fields: ['maTohop', 'maMon'],
+          fields: ['maToHop', 'maMon'], // ✔ sửa typo
         },
       ],
     }
   );
+
+  // =========================
+  // ASSOCIATIONS (CHUẨN)
+  // =========================
   CauTrucToHop.associate = (models) => {
-    CauHinhXetTuyen.belongsTo(models.ToHopMon, {
+    // bảng trung gian → belongsTo 2 phía
+    CauTrucToHop.belongsTo(models.ToHopMon, {
       foreignKey: 'maToHop',
     });
-    CauHinhXetTuyen.belongsTo(models.MonHoc, {
+
+    CauTrucToHop.belongsTo(models.MonHoc, {
       foreignKey: 'maMon',
     });
   };

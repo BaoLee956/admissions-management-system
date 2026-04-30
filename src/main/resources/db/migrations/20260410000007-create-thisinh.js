@@ -10,6 +10,11 @@ module.exports = {
         autoIncrement: true,
         allowNull: false,
       },
+      cccd: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique : true,
+      },
       hoTen: {
         type: Sequelize.STRING,
         allowNull: false,
