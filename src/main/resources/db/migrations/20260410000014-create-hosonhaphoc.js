@@ -16,6 +16,7 @@ module.exports = {
         unique: true, // 🔥 mỗi thí sinh 1 hồ sơ
         references: { model: 'ThiSinh', key: 'sbd' },
         onUpdate: 'CASCADE',
+<<<<<<< HEAD
         onDelete: 'RESTRICT',
       },
       nguoiDuyet:{
@@ -24,6 +25,9 @@ module.exports = {
         references: { model: 'NhanVien', key: 'maNhanVien' },
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL',
+=======
+        onDelete: 'CASCADE',
+>>>>>>> origin/feature/candidate-ui-week2
       },
 
       trangThai: {
@@ -32,11 +36,14 @@ module.exports = {
         defaultValue: 'PENDING',
       },
 
+<<<<<<< HEAD
       ngayNop: {
         type: Sequelize.DATE,
         allowNull: false,
       },
 
+=======
+>>>>>>> origin/feature/candidate-ui-week2
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

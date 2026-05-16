@@ -26,10 +26,17 @@ module.exports = {
         onDelete: 'CASCADE',
       },
 
+<<<<<<< HEAD
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: { model: 'ChiTieuTuyenSinh', key: 'id' },
+=======
+      maNganh: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: { model: 'Nganh', key: 'maNganh' },
+>>>>>>> origin/feature/candidate-ui-week2
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
@@ -46,11 +53,14 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
+<<<<<<< HEAD
       
       diemTong: {
         type: Sequelize.FLOAT,
         allowNull: false,
       },
+=======
+>>>>>>> origin/feature/candidate-ui-week2
 
       trangThai: {
         type: Sequelize.ENUM('PENDING', 'APPROVED', 'REJECTED'),
@@ -78,11 +88,19 @@ module.exports = {
       name: 'unique_thisinh_thutu',
     });
 
+<<<<<<< HEAD
     // 🔥 mỗi thí sinh chỉ có 1 chỉ tiêu
     await queryInterface.addConstraint('NguyenVong', {
       fields: ['sbd', 'id'],
       type: 'unique',
       name: 'unique_thisinh_chitieu',
+=======
+    // 🔥 tránh đăng ký trùng ngành
+    await queryInterface.addConstraint('NguyenVong', {
+      fields: ['sbd', 'maDot', 'maNganh'],
+      type: 'unique',
+      name: 'unique_thisinh_nganh',
+>>>>>>> origin/feature/candidate-ui-week2
     });
   },
 
