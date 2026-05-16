@@ -4,13 +4,6 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('CauTrucToHop', {
 
-      id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-        allowNull: false,
-      },
-
       maToHop: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -35,10 +28,6 @@ module.exports = {
         onDelete: 'CASCADE',
       },
 
-      heSo: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
 
       createdAt: {
         type: Sequelize.DATE,
