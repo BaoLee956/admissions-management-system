@@ -1,6 +1,6 @@
 'use strict';
 
-const db = require('../../models');
+const db = require('../models');
 
 const {
   Nganh,

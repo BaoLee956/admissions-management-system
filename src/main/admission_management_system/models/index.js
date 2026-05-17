@@ -11,7 +11,7 @@ const db = {};
 let sequelize;
 try {
   const config = require('../config/database'); // or wherever your config is
-  sequelize = new Sequelize(config);
+  sequelize = new Sequelize(config.development);
 } catch (error) {
   // If config doesn't exist yet, sequelize will be initialized elsewhere
   console.log('⚠️ Database config not found. Sequelize will be initialized elsewhere.');
@@ -210,7 +210,7 @@ db.ToHopMon.hasMany(db.NguyenVong, {
 db.ChiTieuTuyenSinh.hasMany(db.NguyenVong, {
   foreignKey: 'maNganh',
   as: 'nguyenVongs',
-  scope: { 'maDot': sequelize.where(sequelize.col('ChiTieuTuyenSinh.maDot'), sequelize.Op.eq, sequelize.col('NguyenVong.maDot')) },
+  scope: { 'maDot': sequelize.where(sequelize.col('ChiTieuTuyenSinh.maDot'), Sequelize.Op.eq, sequelize.col('NguyenVong.maDot')) },
   onUpdate: 'CASCADE',
   onDelete: 'CASCADE',
 });
@@ -358,20 +358,6 @@ db.NhomQuyen.hasMany(db.NhanVien, {
 db.NhanVien.belongsTo(db.NhomQuyen, {
   foreignKey: 'maNhom',
   as: 'nhomQuyen',
-});
-
-// ========== DOT TUYEN SINH <-> CAU HINH XET TUYEN ==========
-// CauHinhXetTuyen.belongsTo(DotTuyenSinh)
-db.CauHinhXetTuyen.belongsTo(db.DotTuyenSinh, {
-  foreignKey: 'maDot',
-  as: 'dotTuyenSinh',
-});
-// DotTuyenSinh.hasMany(CauHinhXetTuyen)
-db.DotTuyenSinh.hasMany(db.CauHinhXetTuyen, {
-  foreignKey: 'maDot',
-  as: 'cauHinhXetTuyens',
-  onUpdate: 'CASCADE',
-  onDelete: 'CASCADE',
 });
 
 // Export models and sequelize

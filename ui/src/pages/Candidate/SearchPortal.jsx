@@ -6,16 +6,72 @@ const SearchPortal = () => {
     sbd: "",
     cccd: "",
   });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setError(""); // Clear error khi user thay đổi input
   };
 
-  const handleSubmit = () => {
-    // TODO: gọi API
-    navigate("/otp");
+  const validateForm = () => {
+    if (!form.sbd.trim()) {
+      setError("Vui lòng nhập số báo danh");
+      return false;
+    }
+    if (!/^\d{8}$/.test(form.sbd.trim())) {
+      setError("Số báo danh phải là 8 chữ số");
+      return false;
+    }
+    if (!form.cccd.trim()) {
+      setError("Vui lòng nhập số CCCD");
+      return false;
+    }
+    if (!/^\d{12}$/.test(form.cccd.trim())) {
+      setError("CCCD phải là 12 chữ số");
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async () => {
+    setError("");
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch("/api/verify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          sbd: form.sbd.trim(),
+          cccd: form.cccd.trim(),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || "Xác thực thất bại");
+        return;
+      }
+
+      // Lưu thông tin vào localStorage hoặc context nếu cần
+      localStorage.setItem("candidateInfo", JSON.stringify(data.data));
+      navigate("/otp");
+    } catch (err) {
+      setError("Lỗi kết nối, vui lòng thử lại");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -42,19 +98,27 @@ const SearchPortal = () => {
           Nhập thông tin để nhận mã OTP xác thực
         </p>
 
+        {/* Error Message */}
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm">
+            {error}
+          </div>
+        )}
+
         {/* SBD */}
         <div className="mb-4">
           <label className="text-sm font-medium">Số báo danh</label>
           <input
             type="text"
             name="sbd"
-            placeholder="Nhập số báo danh..."
+            placeholder="Nhập 8 chữ số..."
             value={form.sbd}
             onChange={handleChange}
-            className="w-full mt-1 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={loading}
+            className="w-full mt-1 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
           />
           <p className="text-xs text-gray-400 mt-1">
-            Số báo danh của thí sinh
+            Số báo danh của thí sinh (8 chữ số)
           </p>
         </div>
 
@@ -64,22 +128,24 @@ const SearchPortal = () => {
           <input
             type="text"
             name="cccd"
-            placeholder="Nhập số CCCD 12 chữ số..."
+            placeholder="Nhập 12 chữ số..."
             value={form.cccd}
             onChange={handleChange}
-            className="w-full mt-1 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={loading}
+            className="w-full mt-1 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
           />
           <p className="text-xs text-gray-400 mt-1">
-            Căn cước công dân 12 số
+            Căn cước công dân (12 chữ số)
           </p>
         </div>
 
         {/* Button */}
         <button
           onClick={handleSubmit}
-          className="w-full bg-gray-800 text-white py-2 rounded hover:bg-black transition"
+          disabled={loading}
+          className="w-full bg-gray-800 text-white py-2 rounded hover:bg-black transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Nhận mã OTP
+          {loading ? "Đang xác thực..." : "Nhận mã OTP"}
         </button>
 
         {/* Note */}
