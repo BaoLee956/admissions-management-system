@@ -44,4 +44,15 @@ router.post(
   '/upload-giay-to',
   AdminController.uploadGiayTo
 );
+
+router.get(
+  '/requests/pending',
+  AdminController.getPendingRequests
+);
+
+router.put(
+  '/requests/:id/handle',
+  AdminController.handleApprovalRequest
+);
+
 module.exports = router;

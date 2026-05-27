@@ -32,7 +32,6 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL',
       },
-<<<<<<< HEAD
       
       loaiYeuCau: {
         type: Sequelize.STRING,
@@ -48,8 +47,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
-=======
->>>>>>> origin/feature/candidate-ui-week2
 
       trangThai: {
         type: Sequelize.STRING,
@@ -57,14 +54,6 @@ module.exports = {
         defaultValue: 'PENDING', // APPROVED / REJECTED
       },
 
-<<<<<<< HEAD
-=======
-      ghiChu: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-
->>>>>>> origin/feature/candidate-ui-week2
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

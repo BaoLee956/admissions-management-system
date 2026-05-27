@@ -8,6 +8,8 @@ const {
   DotTuyenSinh,
   HoSoNhapHoc,
   GiayToDinhKem,
+  YeuCauPheDuyet,
+  ThiSinh,
 } = db;
 
 class AdminController {
@@ -499,6 +501,178 @@ class AdminController {
       return res.status(500).json({
         success: false,
         message: 'Lỗi server',
+        error: error.message,
+      });
+    }
+  }
+
+  // =========================
+  // GET PENDING REQUESTS
+  // =========================
+  static async getPendingRequests(req, res) {
+    try {
+      const pendingRequests = await YeuCauPheDuyet.findAll({
+        where: { trangThai: 'PENDING' },
+        include: [
+          {
+            model: HoSoNhapHoc,
+            attributes: ['maHoSo', 'ngayNop', 'trangThai'],
+            include: [
+              {
+                model: ThiSinh,
+                attributes: ['sbd', 'hoTen', 'email'],
+              },
+            ],
+          },
+        ],
+        order: [['createdAt', 'ASC']],
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: 'Lấy danh sách yêu cầu chờ duyệt thành công',
+        count: pendingRequests.length,
+        data: pendingRequests,
+      });
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        success: false,
+        message: 'Lỗi server khi lấy danh sách yêu cầu',
+        error: error.message,
+      });
+    }
+  }
+
+  // =========================
+  // HANDLE APPROVAL REQUEST
+  // =========================
+  static async handleApprovalRequest(req, res) {
+    const transaction = await db.sequelize.transaction();
+    try {
+      const { id } = req.params;
+      const { action, reason } = req.body; // action: 'APPROVED' or 'REJECTED'
+
+      if (!id || isNaN(id)) {
+        await transaction.rollback();
+        return res.status(400).json({
+          success: false,
+          message: 'ID yêu cầu không hợp lệ',
+        });
+      }
+
+      if (!action || !['APPROVED', 'REJECTED'].includes(action)) {
+        await transaction.rollback();
+        return res.status(400).json({
+          success: false,
+          message: 'Hành động không hợp lệ (APPROVED hoặc REJECTED)',
+        });
+      }
+
+      if (action === 'REJECTED' && (!reason || reason.trim() === '')) {
+        await transaction.rollback();
+        return res.status(400).json({
+          success: false,
+          message: 'Vui lòng cung cấp lý do từ chối',
+        });
+      }
+
+      const yeuCau = await YeuCauPheDuyet.findByPk(id, { transaction });
+      if (!yeuCau) {
+        await transaction.rollback();
+        return res.status(404).json({
+          success: false,
+          message: 'Không tìm thấy yêu cầu phê duyệt',
+        });
+      }
+
+      if (yeuCau.trangThai !== 'PENDING') {
+        await transaction.rollback();
+        return res.status(400).json({
+          success: false,
+          message: `Yêu cầu này đã được xử lý trước đó (Trạng thái hiện tại: ${yeuCau.trangThai})`,
+        });
+      }
+
+      const hoSo = await HoSoNhapHoc.findByPk(yeuCau.maHoSo, { transaction });
+
+      if (action === 'REJECTED') {
+        yeuCau.trangThai = 'REJECTED';
+        yeuCau.liDoTuChoi = reason.trim();
+        await yeuCau.save({ transaction });
+
+        // Nếu Admin từ chối yêu cầu BỔ SUNG hoặc TỪ CHỐI của Cán bộ,
+        // thì chuyển hồ sơ về PENDING để xem xét lại
+        if (hoSo && (yeuCau.loaiYeuCau === 'BÔ_SUNG' || yeuCau.loaiYeuCau === 'TỪ_CHỐI')) {
+          hoSo.trangThai = 'PENDING';
+          await hoSo.save({ transaction });
+        }
+
+        await transaction.commit();
+        return res.status(200).json({
+          success: true,
+          message: 'Từ chối yêu cầu thành công',
+          data: yeuCau,
+        });
+      }
+
+      // Trường hợp APPROVED
+      yeuCau.trangThai = 'APPROVED';
+      await yeuCau.save({ transaction });
+
+      if (!hoSo) {
+        // Nếu không tìm thấy hồ sơ liên quan, chỉ lưu trạng thái yêu cầu
+        await transaction.commit();
+        return res.status(200).json({
+          success: true,
+          message: 'Phê duyệt yêu cầu thành công (Không tìm thấy hồ sơ đi kèm)',
+          data: yeuCau,
+        });
+      }
+
+      if (yeuCau.loaiYeuCau === 'XÓA') {
+        // Thực hiện xóa hồ sơ
+        await hoSo.destroy({ transaction });
+        // Do có cascade delete ở database level, yeuCau này cũng sẽ bị xóa.
+        // Nhưng ta đã lưu giao dịch, trả về thông tin đã xử lý thành công.
+        await transaction.commit();
+        return res.status(200).json({
+          success: true,
+          message: 'Phê duyệt yêu cầu thành công. Đã xóa hồ sơ.',
+          data: {
+            id: yeuCau.id,
+            maHoSo: yeuCau.maHoSo,
+            loaiYeuCau: 'XÓA',
+            trangThai: 'APPROVED',
+          },
+        });
+      } else if (yeuCau.loaiYeuCau === 'SỬA') {
+        // Chuyển hồ sơ về trạng thái PENDING để có thể sửa
+        hoSo.trangThai = 'PENDING';
+        await hoSo.save({ transaction });
+      } else if (yeuCau.loaiYeuCau === 'BÔ_SUNG') {
+        // Đồng ý với yêu cầu bổ sung của Officer
+        hoSo.trangThai = 'REQUEST_SUPPLEMENT';
+        await hoSo.save({ transaction });
+      } else if (yeuCau.loaiYeuCau === 'TỪ_CHỐI') {
+        // Đồng ý từ chối hồ sơ
+        hoSo.trangThai = 'REJECTED';
+        await hoSo.save({ transaction });
+      }
+
+      await transaction.commit();
+      return res.status(200).json({
+        success: true,
+        message: `Phê duyệt yêu cầu thành công (Loại yêu cầu: ${yeuCau.loaiYeuCau})`,
+        data: yeuCau,
+      });
+    } catch (error) {
+      await transaction.rollback();
+      console.error(error);
+      return res.status(500).json({
+        success: false,
+        message: 'Lỗi server khi xử lý yêu cầu phê duyệt',
         error: error.message,
       });
     }

@@ -31,14 +31,11 @@ module.exports = {
         allowNull: false,
       },
 
-<<<<<<< HEAD
       diemChuan: {
         type: Sequelize.FLOAT,
         allowNull: false,
       },
 
-=======
->>>>>>> origin/feature/candidate-ui-week2
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

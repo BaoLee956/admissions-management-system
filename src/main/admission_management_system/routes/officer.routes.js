@@ -22,6 +22,9 @@ router.put('/profiles/:maHoSo/status', validatorMiddleware, controller.updatePro
 // GET - Lấy danh sách yêu cầu chờ xử lý
 router.get('/requests/pending', controller.getPendingRequests);
 
+// POST - Tạo yêu cầu phê duyệt mới (chỉnh sửa/xóa hồ sơ)
+router.post('/requests', validatorMiddleware, controller.createRequest);
+
 // PUT - Xử lý yêu cầu phê duyệt
 router.put('/requests/:id/handle', validatorMiddleware, controller.handleApprovalRequest);
 

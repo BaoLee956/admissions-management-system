@@ -234,6 +234,107 @@ module.exports = {
     }
   },
 
+  // ======================================
+  // 5. TẠO YÊU CẦU XIN CHỈNH SỬA / XÓA HỒ SƠ
+  // ======================================
+  async createRequest(req, res) {
+    try {
+      const { maHoSo, loaiYeuCau, liDoYeuCau } = req.body;
+
+      // 1. Kiểm tra đầu vào
+      if (!maHoSo || isNaN(maHoSo)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Mã hồ sơ không hợp lệ',
+        });
+      }
+
+      if (!loaiYeuCau) {
+        return res.status(400).json({
+          success: false,
+          message: 'Vui lòng cung cấp loại yêu cầu',
+        });
+      }
+
+      // Chuẩn hóa loại yêu cầu: Chấp nhận 'SỬA', 'EDIT', 'XÓA', 'DELETE'
+      let normalizedLoai = loaiYeuCau.toUpperCase().trim();
+      if (normalizedLoai === 'EDIT') normalizedLoai = 'SỬA';
+      if (normalizedLoai === 'DELETE') normalizedLoai = 'XÓA';
+
+      const validTypes = ['SỬA', 'XÓA', 'BÔ_SUNG', 'TỪ_CHỐI'];
+      if (!validTypes.includes(normalizedLoai)) {
+        return res.status(400).json({
+          success: false,
+          message: `Loại yêu cầu không hợp lệ. Chấp nhận: ${validTypes.join(', ')}`,
+        });
+      }
+
+      if (!liDoYeuCau || typeof liDoYeuCau !== 'string' || liDoYeuCau.trim() === '') {
+        return res.status(400).json({
+          success: false,
+          message: 'Vui lòng cung cấp lý do yêu cầu',
+        });
+      }
+
+      // 2. Kiểm tra hồ sơ có tồn tại không
+      const hoSo = await HoSoNhapHoc.findByPk(maHoSo);
+      if (!hoSo) {
+        return res.status(404).json({
+          success: false,
+          message: 'Không tìm thấy hồ sơ',
+        });
+      }
+
+      // 3. Kiểm tra xem đã có yêu cầu cho hồ sơ này chưa
+      // Do maHoSo có constraint unique: true trong YeuCauPheDuyet
+      const existingRequest = await YeuCauPheDuyet.findOne({
+        where: { maHoSo },
+      });
+
+      let responseData;
+
+      if (existingRequest) {
+        // Nếu yêu cầu hiện tại đang chờ duyệt
+        if (existingRequest.trangThai === 'PENDING') {
+          return res.status(400).json({
+            success: false,
+            message: 'Hồ sơ này đang có một yêu cầu phê duyệt chờ xử lý',
+          });
+        }
+
+        // Nếu đã được duyệt hoặc từ chối, ta ghi đè/cập nhật lại yêu cầu này để tránh lỗi unique constraint
+        existingRequest.loaiYeuCau = normalizedLoai;
+        existingRequest.liDoYeuCau = liDoYeuCau.trim();
+        existingRequest.trangThai = 'PENDING';
+        existingRequest.liDoTuChoi = null;
+        existingRequest.maNhanVien = req.user?.maNhanVien || 1; // Lấy từ token hoặc mặc định
+        await existingRequest.save();
+        responseData = existingRequest;
+      } else {
+        // Tạo yêu cầu mới
+        responseData = await YeuCauPheDuyet.create({
+          maHoSo,
+          maNhanVien: req.user?.maNhanVien || 1, // Lấy từ token hoặc mặc định
+          loaiYeuCau: normalizedLoai,
+          liDoYeuCau: liDoYeuCau.trim(),
+          trangThai: 'PENDING',
+        });
+      }
+
+      return res.status(201).json({
+        success: true,
+        message: 'Gửi yêu cầu phê duyệt thành công',
+        data: responseData,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: 'Lỗi khi gửi yêu cầu phê duyệt',
+        error: error.message,
+      });
+    }
+  },
+
   async index(_req, res) {
     return res.json({ ok: true });
   },

@@ -36,14 +36,11 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-<<<<<<< HEAD
       
       ghiChuLoi: {
         type: Sequelize.STRING,
         allowNull: true,
       },
-=======
->>>>>>> origin/feature/candidate-ui-week2
 
       createdAt: {
         type: Sequelize.DATE,
