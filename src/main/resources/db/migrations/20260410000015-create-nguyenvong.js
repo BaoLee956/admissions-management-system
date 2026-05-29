@@ -26,10 +26,10 @@ module.exports = {
         onDelete: 'CASCADE',
       },
 
-      maNganh: {
+      id: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: 'Nganh', key: 'maNganh' },
+        references: { model: 'ChiTieuTuyenSinh', key: 'id' },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
@@ -44,6 +44,11 @@ module.exports = {
 
       thuTuUuTien: {
         type: Sequelize.INTEGER,
+        allowNull: false,
+      },
+      
+      diemTong: {
+        type: Sequelize.FLOAT,
         allowNull: false,
       },
 
@@ -73,11 +78,11 @@ module.exports = {
       name: 'unique_thisinh_thutu',
     });
 
-    // 🔥 tránh đăng ký trùng ngành
+    // 🔥 mỗi thí sinh chỉ có 1 chỉ tiêu
     await queryInterface.addConstraint('NguyenVong', {
-      fields: ['sbd', 'maDot', 'maNganh'],
+      fields: ['sbd', 'id'],
       type: 'unique',
-      name: 'unique_thisinh_nganh',
+      name: 'unique_thisinh_chitieu',
     });
   },
 

@@ -31,6 +31,11 @@ module.exports = {
         allowNull: false,
       },
 
+      diemChuan: {
+        type: Sequelize.FLOAT,
+        allowNull: false,
+      },
+
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

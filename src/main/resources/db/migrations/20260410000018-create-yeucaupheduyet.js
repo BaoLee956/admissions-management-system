@@ -32,16 +32,26 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL',
       },
+      
+      loaiYeuCau: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+
+      liDoYeuCau: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+
+      liDoTuChoi: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
 
       trangThai: {
         type: Sequelize.STRING,
         allowNull: false,
         defaultValue: 'PENDING', // APPROVED / REJECTED
-      },
-
-      ghiChu: {
-        type: Sequelize.STRING,
-        allowNull: true,
       },
 
       createdAt: {

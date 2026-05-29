@@ -10,6 +10,11 @@ module.exports = {
         autoIncrement: true,
         allowNull: false,
       },
+      cccd: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique : true,
+      },
       hoTen: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -42,6 +47,14 @@ module.exports = {
       },
       doiTuongUuTien: {
         type: Sequelize.STRING,
+        allowNull: false,
+      },
+      otp_code: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      otp_expires: {
+        type: Sequelize.DATE,
         allowNull: false,
       },
       createdAt: {
