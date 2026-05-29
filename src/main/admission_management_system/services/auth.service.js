@@ -1,5 +1,6 @@
 'use strict';
 
+const jwt = require('jsonwebtoken'); // 1. Bổ sung thư viện mã hóa JWT
 const { ThiSinh } = require('../models');
 
 // ===== VALIDATE =====
@@ -44,6 +45,19 @@ const verifySBDAndCCCD = async (sbd, cccd) => {
   };
 };
 
+/**
+ * 2. Bổ sung hàm ký số và sinh chuỗi xác thực JWT Token
+ * @param {Object} payload - Dữ liệu người dùng cần đóng gói (sbd; role; hoTen; email;...)
+ * @returns {string} - Chuỗi Token đã mã hóa bảo mật
+ */
+const generateToken = (payload) => {
+  return jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN || '7d'
+  });
+};
+
+// 3. Cập nhật đối tượng xuất bản để Controller có thể gọi đồng thời cả 2 chức năng
 module.exports = {
   verifySBDAndCCCD,
+  generateToken,
 };

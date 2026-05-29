@@ -9,7 +9,7 @@ module.exports = {
     host: process.env.DB_HOST || '127.0.0.1',
     port: Number(process.env.DB_PORT) || 5432,
     dialect: 'postgres',
-    logging: process.env.DB_LOGGING === 'true',
+    logging: process.env.DB_LOGGING === 'true' ? console.log : false,
     pool: {
       max: 5,
       min: 0,

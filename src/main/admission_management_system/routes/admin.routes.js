@@ -2,6 +2,16 @@
 
 const express = require('express');
 const router = express.Router();
+const controller = require('../controllers/admin.controller');
+const { verifyToken, authorizeRoles } = require('../middlewares/auth.middleware');
+
+// Ép toàn bộ các tuyến đường bên dưới phải đi qua bộ lọc cấu hình ADMIN
+router.use(verifyToken, authorizeRoles(['ADMIN']));
+
+// Sau dòng router.use này, toàn bộ API bên dưới mặc định đã được bảo vệ an toàn
+router.post('/imports', controller.importExcel);
+router.put('/rounds/:id/status', controller.updateRoundStatus);
+router.post('/users', controller.createNewUser);
 
 const AdminController = require('../controllers/admin.controller');
 

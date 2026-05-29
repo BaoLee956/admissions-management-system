@@ -1,5 +1,7 @@
 'use strict';
-
+require('dotenv').config();
+require('./config/mailer');
+// Các đoạn code khởi tạo Express app ở bên dưới...
 const express = require('express');
 const cors = require('cors');
 
