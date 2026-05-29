@@ -6,12 +6,13 @@ import useAuthStore from "../../store/useAuthStore";
 
 const OTPVerify = () => {
   const [otp, setOtp] = useState(Array(6).fill(""));
-  const [errorMsg, setErrorMsg] = useState(""); // Thêm state để hiển thị lỗi
+  const [errorMsg, setErrorMsg] = useState("");
   const inputsRef = useRef([]);
-  const { time } = useCountdown(60);
+  
+  // Đổi bộ đếm ngược thành 300 giây (5 phút) cho khớp với Backend mới
+  const { time } = useCountdown(300); 
   const navigate = useNavigate();
   
-  // Lấy hàm login từ thư viện Zustand
   const login = useAuthStore((state) => state.login);
 
   const handleChange = (value, index) => {
@@ -20,9 +21,8 @@ const OTPVerify = () => {
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
-    setErrorMsg(""); // Xóa lỗi khi người dùng bắt đầu nhập lại
+    setErrorMsg(""); 
 
-    // tự nhảy sang ô tiếp theo
     if (value && index < 5) {
       inputsRef.current[index + 1].focus();
     }
@@ -34,32 +34,37 @@ const OTPVerify = () => {
     }
   };
 
-  // Đổi hàm này thành async để gọi API
   const handleSubmit = async () => {
     const code = otp.join("");
     
-    // Validate cơ bản
     if (code.length < 6) {
       setErrorMsg("Vui lòng nhập đủ 6 số OTP");
       return;
     }
 
     try {
-      // Tạm thời hardcode SBD để test. 
-      // Sau này SBD sẽ được lấy từ localStorage hoặc React Router State từ trang SearchPortal truyền sang.
-      const data = { sbd: "0100234", otpCode: code };
+      // 1. Lấy SBD động từ localStorage đã được lưu ở trang SearchPortal
+      const currentSbd = localStorage.getItem("temp_sbd");
       
-      // Gọi API xác thực
+      // Nếu vì lý do nào đó SBD bị mất, yêu cầu người dùng quay lại
+      if (!currentSbd) {
+        setErrorMsg("Không tìm thấy thông tin thí sinh. Vui lòng quay lại trang tra cứu.");
+        return;
+      }
+
+      // 2. Gửi SBD thực tế và mã OTP lên Backend
+      const data = { sbd: currentSbd, otpCode: code };
+      
       const result = await authApi.verifyOTP(data);
 
-      // Nếu thành công, lưu Token và chuyển hướng
-      if (result.data && result.data.token) {
-        login(result.data, result.data.token);
-        navigate("/result"); // Chuyển sang trang kết quả
+      if (result.success && result.token) {
+        // Xóa temp_sbd đi cho sạch sẽ sau khi đăng nhập thành công
+        localStorage.removeItem("temp_sbd");
+        login(result, result.token);
+        navigate("/result");
       }
     } catch (error) {
-      // Bắt lỗi từ Backend trả về (Ví dụ: 401 Unauthorized do OTP sai/hết hạn)
-      if (error.response && error.response.data) {
+      if (error.response && error.response.data && error.response.data.error) {
         setErrorMsg(error.response.data.error.message);
       } else {
         setErrorMsg("Có lỗi xảy ra khi kết nối đến máy chủ.");
@@ -78,8 +83,7 @@ const OTPVerify = () => {
       <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md flex flex-col items-center">
         <h2 className="text-2xl font-bold mb-2">Xác thực OTP</h2>
         <p className="text-gray-500 mb-6 text-center">
-          Mã xác thực đã được gửi về email <br />
-          <span className="font-medium">ng***@gmail.com</span>
+          Mã xác thực đã được gửi về email của bạn
         </p>
 
         {/* OTP INPUT */}
@@ -100,7 +104,7 @@ const OTPVerify = () => {
 
         {/* Khu vực hiển thị lỗi */}
         {errorMsg && (
-          <p className="text-red-500 text-sm font-semibold mb-4">{errorMsg}</p>
+          <p className="text-red-500 text-sm font-semibold mb-4 text-center">{errorMsg}</p>
         )}
 
         {/* Countdown */}
@@ -114,8 +118,8 @@ const OTPVerify = () => {
         {/* Button */}
         <button
           onClick={handleSubmit}
-          disabled={time === 0} // Disable nút nếu hết giờ
-          className={`w-full py-3 rounded-xl mb-3 font-semibold text-white ${
+          disabled={time === 0} 
+          className={`w-full py-3 rounded-xl mb-3 font-semibold text-white transition-colors ${
             time === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
           }`}
         >

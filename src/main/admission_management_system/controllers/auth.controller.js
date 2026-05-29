@@ -16,15 +16,18 @@ module.exports = {
         return res.status(400).json({ error: { message: 'Vui lòng cung cấp SBD và CCCD' } });
       }
 
-      // Kiểm tra SBD và CCCD có hợp lệ trong Database không
       const thiSinh = await authService.verifySBDAndCCCD(sbd, cccd);
 
-      // Sinh mã OTP 6 số và lưu vào RAM (kèm thời gian hết hạn sau 60 giây)
       const otpCode = emailService.generateOTP();
-      const expiresAt = Date.now() + 60 * 1000; 
-      otpStorage.set(sbd.toString(), { otpCode, expiresAt });
+      const expiresAt = Date.now() + 5 * 60 * 1000; 
+      
+      const keyToSave = sbd.toString();
+      otpStorage.set(keyToSave, { otpCode, expiresAt });
 
-      // Gửi email
+      // Cắm cờ theo dõi lúc lưu OTP
+      console.log(`\n🟢 [TẠO OTP] Đã lưu OTP cho SBD: '${keyToSave}'. Mã: ${otpCode}`);
+      console.log(`🟢 [KHO RAM HIỆN TẠI] Các SBD đang có:`, Array.from(otpStorage.keys()));
+
       await emailService.sendOTPEmail(thiSinh.email, otpCode);
 
       return res.status(200).json({
@@ -32,7 +35,6 @@ module.exports = {
         message: `Mã OTP đã được gửi đến email ${thiSinh.email}`
       });
     } catch (error) {
-      // Bắt lỗi nếu sai SBD/CCCD từ authService
       return res.status(400).json({ error: { message: error.message } });
     }
   },
@@ -42,31 +44,37 @@ module.exports = {
     try {
       const { sbd, otpCode } = req.body;
 
+      // Cắm cờ theo dõi lúc nhận OTP từ FE gửi lên
+      console.log(`\n🟡 [XÁC THỰC] Frontend vừa gửi lên SBD: '${sbd}', OTP: '${otpCode}'`);
+      console.log(`🟡 [KHO RAM TRƯỚC KHI TÌM] Các SBD đang có:`, Array.from(otpStorage.keys()));
+
       if (!sbd || !otpCode) {
         return res.status(400).json({ error: { message: 'Vui lòng cung cấp SBD và mã OTP' } });
       }
 
-      const storedData = otpStorage.get(sbd.toString());
+      const keyToFind = sbd.toString();
+      const storedData = otpStorage.get(keyToFind);
 
-      // Kiểm tra mã có tồn tại và chưa hết hạn
       if (!storedData) {
+        console.log(`🔴 [LỖI] Không tìm thấy key '${keyToFind}' trong kho RAM!`);
         return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'Mã OTP không tồn tại hoặc đã hết hạn' } });
       }
 
       if (Date.now() > storedData.expiresAt) {
-        otpStorage.delete(sbd.toString()); // Xóa mã hết hạn
-        return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'Mã OTP đã hết hạn (quá 60 giây)' } });
+        console.log(`🔴 [LỖI] Mã của '${keyToFind}' đã bị quá hạn 5 phút!`);
+        otpStorage.delete(keyToFind);
+        return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'Mã OTP đã hết hạn (quá 5 phút)' } });
       }
 
       if (storedData.otpCode !== otpCode.toString()) {
+        console.log(`🔴 [LỖI] Mã FE gửi (${otpCode}) không khớp với mã trong RAM (${storedData.otpCode})!`);
         return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'Mã OTP không chính xác' } });
       }
 
-      // Xác thực thành công -> Xóa mã OTP khỏi RAM để tránh dùng lại
-      otpStorage.delete(sbd.toString());
+      console.log(`🟢 [THÀNH CÔNG] Đăng nhập hợp lệ! Đang xóa mã khỏi RAM...`);
+      otpStorage.delete(keyToFind);
 
-      // Lấy thông tin thí sinh để đóng gói vào Token
-      const thiSinh = await authService.verifySBDAndCCCD(sbd, req.body.cccd || "001082946357"); // Tạm hardcode CCCD để lấy info, thực tế nên query lại DB bằng sbd
+      const thiSinh = await authService.verifySBDAndCCCD(sbd, req.body.cccd || "123456789012"); 
       
       const payload = {
         id: thiSinh.sbd,
@@ -84,6 +92,7 @@ module.exports = {
         hoTen: thiSinh.hoTen
       });
     } catch (error) {
+      console.error(error);
       return res.status(500).json({ error: { message: 'Lỗi máy chủ khi xác thực OTP' } });
     }
   }

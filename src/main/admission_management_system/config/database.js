@@ -16,12 +16,12 @@ module.exports = {
       acquire: 30000,
       idle: 10000,
     },
-    dialectOptions: {
+    /*dialectOptions: {
       ssl: {
         require: true,
         rejectUnauthorized: false,
       },
-    },
+    }, */
   },
   production: {
     username: process.env.DB_USER,

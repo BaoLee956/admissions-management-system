@@ -49,7 +49,7 @@ const SearchPortal = () => {
     try {
       // Gọi API thực tế xuống Backend (Cổng 4000)
       const data = {
-        sbd: form.sbd.trim(),
+        sbd: Number(form.sbd.trim()),
         cccd: form.cccd.trim(),
       };
       
