@@ -1,4 +1,4 @@
-**Hệ thống Quản lý Tuyển sinh** 
+# Hệ thống Quản lý Tuyển sinh Online - Nhóm 1
 
 Một ứng dụng web phục vụ **tra cứu điểm chuẩn, quản lý hồ sơ và xét tuyển** cho thí sinh và cán bộ tuyển sinh. README này hướng dẫn nhanh cách thiết lập, chạy dự án và liệt kê các công nghệ chính — tối ưu cho lập trình viên tiếp quản hoặc triển khai.
 
