@@ -10,7 +10,7 @@ const verifyToken = (req, res, next) => {
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({
-      error: { code: 'UNAUTHORIZED'; message: 'Không tìm thấy mã token xác thực hợp lệ' }
+      error: { code: 'UNAUTHORIZED', message: 'Không tìm thấy mã token xác thực hợp lệ' }
     });
   }
 
@@ -18,30 +18,30 @@ const verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // Gắn thông tin giải mã (id; role; sbd;...) vào đối tượng request
+    req.user = decoded; 
     next();
   } catch (error) {
     return res.status(401).json({
-      error: { code: 'TOKEN_INVALID_EXPIRED'; message: 'Mã xác thực token không chính xác hoặc đã hết hạn' }
+      error: { code: 'TOKEN_INVALID_EXPIRED', message: 'Mã xác thực token không chính xác hoặc đã hết hạn' }
     });
   }
 };
 
 /**
  * Middleware phân quyền truy cập dựa trên danh sách vai trò cho phép
- * @param {string[]} allowedRoles - Danh sách các quyền hợp lệ (CANDIDATE; OFFICER; ADMIN)
+ * @param {string[]} allowedRoles - Danh sách các quyền hợp lệ (CANDIDATE, OFFICER, ADMIN)
  */
 const authorizeRoles = (allowedRoles) => {
   return (req, res, next) => {
     if (!req.user || !req.user.role) {
       return res.status(403).json({
-        error: { code: 'FORBIDDEN'; message: 'Bạn không có quyền truy cập vào chức năng này' }
+        error: { code: 'FORBIDDEN', message: 'Bạn không có quyền truy cập vào chức năng này' }
       });
     }
 
     if (!allowedRoles.includes(req.user.role)) {
       return res.status(403).json({
-        error: { code: 'ACTION_DENIED'; message: 'Tài khoản của bạn không đủ đặc quyền thực hiện hành động này' }
+        error: { code: 'ACTION_DENIED', message: 'Tài khoản của bạn không đủ đặc quyền thực hiện hành động này' }
       });
     }
 

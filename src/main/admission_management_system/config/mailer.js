@@ -1,18 +1,22 @@
 const nodemailer = require('nodemailer');
-require('dotenv').config();
+const path = require('path');
 
-// Khởi tạo đối tượng transporter với cấu hình SMTP của Gmail
+// Ép buộc nạp lại và GHI ĐÈ mọi biến môi trường bằng file .env của backend
+require('dotenv').config({ 
+    path: path.join(__dirname, '../.env'),
+    override: true 
+});
+
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465, // Sử dụng port 465 cho kết nối bảo mật SSL
+    port: 465, 
     secure: true, 
     auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_APP_PASSWORD
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_APP_PASSWORD
     }
 });
 
-// Kiểm tra trạng thái kết nối ngay khi file được gọi
 transporter.verify((error, success) => {
     if (error) {
         console.error('❌ Lỗi cấu hình Email SMTP:', error.message);
