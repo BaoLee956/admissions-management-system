@@ -1,9 +1,13 @@
-// routes/auth.route.js
+'use strict';
 
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/auth.controller');
 
-router.post('/verify', authController.verify);
+// [POST] Yêu cầu cấp mã OTP
+router.post('/candidates/otp', authController.requestOTP);
+
+// [POST] Xác minh mã OTP
+router.post('/candidates/verify', authController.verifyOTP);
 
 module.exports = router;
