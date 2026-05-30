@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import apiClient from "../../services/apiClient";
 
-const AdminLogin = () => {
-
+const StaffLogin = () => {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     setForm({
@@ -17,24 +19,44 @@ const AdminLogin = () => {
     });
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
-    // Demo login
-    if (
-      form.email === "admin@ptit.edu.vn" &&
-      form.password === "123456"
-    ) {
+    try {
+      const response = await apiClient.post("/admin/login", {
+        email: form.email,
+        password: form.password,
+      });
 
-      alert("Đăng nhập thành công!");
+      if (response.data && response.data.token) {
+        alert("Đăng nhập thành công!");
+        
+        const token = response.data.token;
+        const role = response.data.role;
+        const { maNhom } = response.data.user;
 
-      // Sau login -> sang màn xét tuyển
-      navigate("/admission-process");
+        // Lưu thông tin token và role vào localStorage
+        localStorage.setItem("staffToken", token);
+        localStorage.setItem("userRole", role);
+        localStorage.setItem("maNhom", String(maNhom));
 
-    } else {
-
+        // Phân luồng điều hướng dựa trên maNhom
+        if (maNhom === 8) {
+          navigate("/admin/dashboard");
+        } else if (maNhom === 9) {
+          navigate("/admission-process");
+        } else {
+          alert("Tài khoản không có quyền truy cập hệ thống!");
+        }
+      } else {
+        alert("Sai tài khoản hoặc mật khẩu!");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
       alert("Sai tài khoản hoặc mật khẩu!");
-
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -47,7 +69,6 @@ const AdminLogin = () => {
         px-4
       "
     >
-
       {/* Card */}
       <div
         className="
@@ -59,10 +80,8 @@ const AdminLogin = () => {
           px-8 py-10
         "
       >
-
         {/* Logo */}
         <div className="text-center">
-
           <img
             src="/logo.png"
             alt="PTIT"
@@ -71,13 +90,13 @@ const AdminLogin = () => {
 
           <h1
             className="
-              text-3xl
+              text-2xl
               font-bold
               text-gray-800
               tracking-wide
             "
           >
-            LOGIN
+            ĐĂNG NHẬP HỆ THỐNG
           </h1>
 
           <p
@@ -87,9 +106,8 @@ const AdminLogin = () => {
               mt-2
             "
           >
-            Sign in to your account
+            Cổng thông tin dành cho Cán bộ & Admin
           </p>
-
         </div>
 
         {/* Divider */}
@@ -100,10 +118,8 @@ const AdminLogin = () => {
           onSubmit={handleLogin}
           className="space-y-5"
         >
-
           {/* Email */}
           <div>
-
             <label
               className="
                 block
@@ -112,7 +128,7 @@ const AdminLogin = () => {
                 mb-2
               "
             >
-              Email
+              Email nhân viên
             </label>
 
             <input
@@ -120,7 +136,8 @@ const AdminLogin = () => {
               name="email"
               value={form.email}
               onChange={handleChange}
-              placeholder="you@company.com"
+              placeholder="name@ptit.edu.vn"
+              required
               className="
                 w-full
                 border border-gray-300
@@ -131,39 +148,24 @@ const AdminLogin = () => {
                 focus:border-black
               "
             />
-
           </div>
 
           {/* Password */}
           <div>
-
             <div
               className="
                 flex justify-between
                 items-center mb-2
               "
             >
-
               <label
                 className="
                   text-sm
                   text-gray-600
                 "
               >
-                Password
+                Mật khẩu
               </label>
-
-              <button
-                type="button"
-                className="
-                  text-xs
-                  text-gray-400
-                  hover:text-gray-600
-                "
-              >
-                Forgot password?
-              </button>
-
             </div>
 
             <input
@@ -172,6 +174,7 @@ const AdminLogin = () => {
               value={form.password}
               onChange={handleChange}
               placeholder="••••••••"
+              required
               className="
                 w-full
                 border border-gray-300
@@ -182,39 +185,24 @@ const AdminLogin = () => {
                 focus:border-black
               "
             />
-
-          </div>
-
-          {/* Remember */}
-          <div
-            className="
-              flex items-center gap-2
-              text-sm text-gray-500
-            "
-          >
-
-            <input type="checkbox" />
-
-            <span>Remember me</span>
-
           </div>
 
           {/* Button */}
           <button
             type="submit"
-            className="
+            disabled={isSubmitting}
+            className={`
               w-full
-              bg-[#2d2d2d]
-              hover:bg-black
               text-white
               py-3
               rounded-md
               transition
-            "
+              font-bold
+              ${isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-[#2d2d2d] hover:bg-black"}
+            `}
           >
-            Login
+            {isSubmitting ? "Đang đăng nhập..." : "Đăng nhập"}
           </button>
-
         </form>
 
         {/* Demo */}
@@ -228,15 +216,11 @@ const AdminLogin = () => {
             text-gray-600
           "
         >
-
           <p className="font-semibold mb-1">
-            Demo Account
+            Tài khoản dùng thử
           </p>
-
-          <p>Email: admin@ptit.edu.vn</p>
-
-          <p>Password: 123456</p>
-
+          <p>Email: admin@ptit.edu.vn (Admin)</p>
+          <p>Mật khẩu: 123456</p>
         </div>
 
         {/* Footer */}
@@ -248,12 +232,11 @@ const AdminLogin = () => {
             mt-8
           "
         >
-          Need access? Contact IT Support
+          Học viện Công nghệ Bưu chính Viễn thông
         </p>
-
       </div>
     </div>
   );
 };
 
-export default AdminLogin;
+export default StaffLogin;

@@ -50,4 +50,32 @@ const uploadFields = upload.fields([
   { name: 'minhChungUuTien', maxCount: 1 },
 ]);
 
+// Cấu hình lọc file Excel (.xls, .xlsx) hoặc CSV
+const excelFilter = (req, file, cb) => {
+  const ext = path.extname(file.originalname).toLowerCase();
+  const allowedExtensions = ['.xls', '.xlsx', '.csv'];
+  const allowedMimeTypes = [
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'text/csv',
+    'application/csv',
+  ];
+
+  if (allowedExtensions.includes(ext) || allowedMimeTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error('Chỉ chấp nhận file Excel (.xls, .xlsx) hoặc CSV.'), false);
+  }
+};
+
+const uploadExcel = multer({
+  storage: storage,
+  fileFilter: excelFilter,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // Giới hạn 10MB
+  },
+});
+
+uploadFields.uploadExcel = uploadExcel;
+
 module.exports = uploadFields;

@@ -6,8 +6,11 @@ import OnlineUpload from "./pages/Candidate/OnlineUpload";
 import PhysicalDocs from "./pages/Officer/PhysicalDocs";
 import OnlineDocsReview from "./pages/Officer/OnlineDocsReview";
 import AdmissionProcess from "./pages/Officer/AdmissionProcess";
-import AdminLogin from "./pages/Admin/AdminLogin";
+import StaffLogin from "./pages/Admin/StaffLogin";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
+import AdminImport from "./pages/Admin/AdminImport";
+import AdminLayout from "./components/layout/AdminLayout";
 
 function App() {
   return (
@@ -28,7 +31,15 @@ function App() {
         <Route path="/physical-docs" element={<PhysicalDocs />}/>
         <Route path="/review" element={<OnlineDocsReview />} />
         <Route path="/admission-process" element={<AdmissionProcess />} />
-        <Route path="/admin" element={<AdminLogin />} />
+        
+        {/* Admin Login Route */}
+        <Route path="/admin-login" element={<StaffLogin />} />
+
+        {/* Admin Console Nested Routes */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="import" element={<AdminImport />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

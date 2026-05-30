@@ -3,6 +3,23 @@
 const express = require('express');
 const router = express.Router();
 const AdminController = require('../controllers/admin.controller');
+const { verifyToken } = require('../middlewares/auth.middleware');
+const uploadFields = require('../middlewares/upload.middleware');
+const uploadExcel = uploadFields.uploadExcel;
+
+const checkAdminRole = (req, res, next) => {
+  if (!req.user || !req.user.maNhom) {
+    return res.status(403).json({
+      success: false,
+      message: 'Bạn không có quyền thực hiện chức năng này.',
+    });
+  }
+  next();
+};
+
+// AUTH
+router.post('/login', AdminController.login);
+router.post('/import', verifyToken, checkAdminRole, uploadExcel.single('file'), AdminController.importCandidates);
 
 // NGANH
 router.post('/nganh', AdminController.createNganh);
