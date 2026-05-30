@@ -3,8 +3,8 @@
 /** @type {import('sequelize-cli').Seeder} */
 module.exports = {
   async up(queryInterface) {
-    // TODO: replace with real seed data
-    await queryInterface.bulkInsert('LoaiGiayTo', [], {});
+    // Đã đóng băng dòng này lại để tránh lỗi cú pháp mảng rỗng
+    // await queryInterface.bulkInsert('LoaiGiayTo', [], {});
   },
 
   async down(queryInterface) {

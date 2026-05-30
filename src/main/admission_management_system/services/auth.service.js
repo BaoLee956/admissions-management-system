@@ -28,7 +28,7 @@ const verifySBDAndCCCD = async (sbd, cccd) => {
   // check DB
   const thiSinh = await ThiSinh.findOne({
     where: {
-      sbd: Number(sbd),
+      sbd: String(sbd).trim(),
       cccd: String(cccd).trim(),
     },
   });

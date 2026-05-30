@@ -19,7 +19,7 @@ module.exports = function CauHinhXetTuyenModel(sequelize, DataTypes) {
         },
       },
       maNganh: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
         references: {
           model: 'Nganh',

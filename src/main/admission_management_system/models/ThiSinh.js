@@ -5,9 +5,9 @@ module.exports = function ThiSinhModel(sequelize, DataTypes) {
     'ThiSinh',
     {
       sbd: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         primaryKey: true,
-        autoIncrement: true,
+        autoIncrement: false,
         allowNull: false,
       },
 
@@ -98,6 +98,11 @@ module.exports = function ThiSinhModel(sequelize, DataTypes) {
 
     ThiSinh.hasOne(models.HoSoNhapHoc, {
       foreignKey: 'sbd',
+    });
+
+    ThiSinh.hasOne(models.KetQuaXetTuyen, {
+      foreignKey: 'sbd',
+      as: 'ketQuaXetTuyen',
     });
   };
 

@@ -31,8 +31,9 @@ module.exports = {
   async getResult(req, res) {
     try {
       const { sbd, maToHop } = req.params;
+      const formattedSbd = sbd ? String(sbd).trim() : '';
 
-      if (!sbd || !maToHop) {
+      if (!formattedSbd || !maToHop) {
         return res.status(400).json({
           success: false,
           message: 'Thiếu SBD hoặc mã tổ hợp',
@@ -40,7 +41,7 @@ module.exports = {
       }
 
       const thiSinh = await ThiSinh.findOne({
-        where: { sbd: Number(sbd) },
+        where: { sbd: formattedSbd },
       });
 
       if (!thiSinh) {

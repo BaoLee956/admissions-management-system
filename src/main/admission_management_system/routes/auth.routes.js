@@ -9,5 +9,6 @@ router.post('/candidates/otp', authController.requestOTP);
 
 // [POST] Xác minh mã OTP
 router.post('/candidates/verify', authController.verifyOTP);
+router.post('/verify-otp', authController.verifyOtp);
 
 module.exports = router;

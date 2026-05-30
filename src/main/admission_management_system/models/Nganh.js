@@ -5,9 +5,9 @@ module.exports = function NganhModel(sequelize, DataTypes) {
     'Nganh',
     {
       maNganh: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         primaryKey: true,
-        autoIncrement: true,
+        autoIncrement: false,
         allowNull: false,
       },
       tenNganh: {

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import useCountdown from "../../hooks/useCountdown";
 import { authApi } from "../../services/auth.api";
 import useAuthStore from "../../store/useAuthStore";
+import apiClient from "../../services/apiClient";
 
 const OTPVerify = () => {
   const [otp, setOtp] = useState(Array(6).fill(""));
@@ -34,7 +35,7 @@ const OTPVerify = () => {
     }
   };
 
-  const handleSubmit = async () => {
+  const handleVerifyOTP = async () => {
     const code = otp.join("");
     
     if (code.length < 6) {
@@ -52,22 +53,25 @@ const OTPVerify = () => {
         return;
       }
 
-      // 2. Gửi SBD thực tế và mã OTP lên Backend
-      const data = { sbd: currentSbd, otpCode: code };
-      
-      const result = await authApi.verifyOTP(data);
+      // 2. Gửi SBD thực tế và mã OTP lên Backend via POST /api/v1/auth/verify-otp
+      const response = await apiClient.post("/auth/verify-otp", {
+        sbd: currentSbd,
+        otp: code,
+      });
 
-      if (result.success && result.token) {
+      if (response.data && response.data.token) {
+        // Lưu token vào Local Storage bằng candidateToken
+        localStorage.setItem("candidateToken", response.data.token);
         // Xóa temp_sbd đi cho sạch sẽ sau khi đăng nhập thành công
         localStorage.removeItem("temp_sbd");
-        login(result, result.token);
-        navigate("/result");
+        login(response.data, response.data.token);
+        navigate("/ket-qua");
       }
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.error) {
-        setErrorMsg(error.response.data.error.message);
+      if (error.response && error.response.data && error.response.data.message) {
+        setErrorMsg(error.response.data.message);
       } else {
-        setErrorMsg("Có lỗi xảy ra khi kết nối đến máy chủ.");
+        setErrorMsg("Mã OTP không chính xác");
       }
     }
   };
@@ -117,7 +121,7 @@ const OTPVerify = () => {
 
         {/* Button */}
         <button
-          onClick={handleSubmit}
+          onClick={handleVerifyOTP}
           disabled={time === 0} 
           className={`w-full py-3 rounded-xl mb-3 font-semibold text-white transition-colors ${
             time === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"

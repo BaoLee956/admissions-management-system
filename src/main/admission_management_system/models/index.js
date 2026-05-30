@@ -360,6 +360,30 @@ db.NhanVien.belongsTo(db.NhomQuyen, {
   as: 'nhomQuyen',
 });
 
+// ========== 20. THI SINH <-> KET QUA XET TUYEN (1:1) ==========
+// db.ThiSinh.hasOne(db.KetQuaXetTuyen, {
+//   foreignKey: 'sbd',
+//   as: 'ketQuaXetTuyen',
+//   onUpdate: 'CASCADE',
+//   onDelete: 'CASCADE',
+// });
+// db.KetQuaXetTuyen.belongsTo(db.ThiSinh, {
+//   foreignKey: 'sbd',
+//   as: 'thiSinh',
+// });
+
+// // ========== 21. NGANH HOC <-> KET QUA XET TUYEN (1:M) ==========
+// db.NganhHoc.hasMany(db.KetQuaXetTuyen, {
+//   foreignKey: 'maNganh',
+//   as: 'ketQuaXetTuyens',
+//   onUpdate: 'CASCADE',
+//   onDelete: 'CASCADE',
+// });
+// db.KetQuaXetTuyen.belongsTo(db.NganhHoc, {
+//   foreignKey: 'maNganh',
+//   as: 'nganhHoc',
+// });
+
 // Export models and sequelize
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;

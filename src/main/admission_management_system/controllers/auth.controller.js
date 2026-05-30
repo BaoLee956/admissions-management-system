@@ -10,7 +10,8 @@ module.exports = {
   // 1. Xử lý yêu cầu gửi OTP
   async requestOTP(req, res) {
     try {
-      const { sbd, cccd } = req.body;
+      const sbd = req.body.sbd ? String(req.body.sbd).trim() : '';
+      const cccd = req.body.cccd ? String(req.body.cccd).trim() : '';
 
       if (!sbd || !cccd) {
         return res.status(400).json({ error: { message: 'Vui lòng cung cấp SBD và CCCD' } });
@@ -39,61 +40,49 @@ module.exports = {
     }
   },
 
-  // 2. Xử lý xác minh OTP
-  async verifyOTP(req, res) {
+  async verifyOtp(req, res) {
     try {
-      const { sbd, otpCode } = req.body;
+      const sbd = req.body.sbd ? String(req.body.sbd).trim() : '';
+      const otp = req.body.otp ? String(req.body.otp).trim() : (req.body.otpCode ? String(req.body.otpCode).trim() : '');
 
-      // Cắm cờ theo dõi lúc nhận OTP từ FE gửi lên
-      console.log(`\n🟡 [XÁC THỰC] Frontend vừa gửi lên SBD: '${sbd}', OTP: '${otpCode}'`);
-      console.log(`🟡 [KHO RAM TRƯỚC KHI TÌM] Các SBD đang có:`, Array.from(otpStorage.keys()));
-
-      if (!sbd || !otpCode) {
-        return res.status(400).json({ error: { message: 'Vui lòng cung cấp SBD và mã OTP' } });
+      if (!sbd || !otp) {
+        return res.status(400).json({ status: 'error', message: 'Vui lòng cung cấp SBD và mã OTP' });
       }
 
-      const keyToFind = sbd.toString();
+      const keyToFind = sbd;
       const storedData = otpStorage.get(keyToFind);
 
       if (!storedData) {
-        console.log(`🔴 [LỖI] Không tìm thấy key '${keyToFind}' trong kho RAM!`);
-        return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'Mã OTP không tồn tại hoặc đã hết hạn' } });
+        return res.status(400).json({ status: 'error', message: 'Mã OTP không chính xác' });
       }
 
       if (Date.now() > storedData.expiresAt) {
-        console.log(`🔴 [LỖI] Mã của '${keyToFind}' đã bị quá hạn 5 phút!`);
         otpStorage.delete(keyToFind);
-        return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'Mã OTP đã hết hạn (quá 5 phút)' } });
+        return res.status(400).json({ status: 'error', message: 'Mã OTP không chính xác' });
       }
 
-      if (storedData.otpCode !== otpCode.toString()) {
-        console.log(`🔴 [LỖI] Mã FE gửi (${otpCode}) không khớp với mã trong RAM (${storedData.otpCode})!`);
-        return res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'Mã OTP không chính xác' } });
+      if (storedData.otpCode !== otp) {
+        return res.status(400).json({ status: 'error', message: 'Mã OTP không chính xác' });
       }
 
-      console.log(`🟢 [THÀNH CÔNG] Đăng nhập hợp lệ! Đang xóa mã khỏi RAM...`);
+      // Xóa OTP khỏi RAM để tránh dùng lại
       otpStorage.delete(keyToFind);
 
-      const thiSinh = await authService.verifySBDAndCCCD(sbd, req.body.cccd || "123456789012"); 
-      
-      const payload = {
-        id: thiSinh.sbd,
-        sbd: thiSinh.sbd,
-        hoTen: thiSinh.hoTen,
-        role: 'CANDIDATE'
-      };
-
-      const token = authService.generateToken(payload);
+      // Tạo Token JWT
+      const jwt = require('jsonwebtoken');
+      const token = jwt.sign({ sbd: sbd }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
       return res.status(200).json({
-        success: true,
+        status: 'success',
         token: token,
-        role: 'CANDIDATE',
-        hoTen: thiSinh.hoTen
       });
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ error: { message: 'Lỗi máy chủ khi xác thực OTP' } });
+      return res.status(500).json({ status: 'error', message: 'Lỗi máy chủ khi xác thực OTP' });
     }
+  },
+
+  async verifyOTP(req, res) {
+    return this.verifyOtp(req, res);
   }
 };

@@ -11,7 +11,7 @@ module.exports = {
       },
 
       sbd: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: false,
         references: { model: 'ThiSinh', key: 'sbd' },
         onUpdate: 'CASCADE',

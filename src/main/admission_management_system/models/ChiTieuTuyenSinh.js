@@ -11,7 +11,7 @@ module.exports = function ChiTieuTuyenSinhModel(sequelize, DataTypes) {
         allowNull: false,
       },
       maNganh: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
         references: {
           model: 'Nganh',

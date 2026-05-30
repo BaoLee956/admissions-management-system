@@ -12,7 +12,7 @@ module.exports = function HoSoNhapHocModel(sequelize, DataTypes) {
       },
 
       sbd: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
         unique: true,
         references: {

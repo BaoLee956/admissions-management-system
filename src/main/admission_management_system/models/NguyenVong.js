@@ -12,7 +12,7 @@ module.exports = function NguyenVongModel(sequelize, DataTypes) {
       },
 
       sbd: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
         references: {
           model: 'ThiSinh',
