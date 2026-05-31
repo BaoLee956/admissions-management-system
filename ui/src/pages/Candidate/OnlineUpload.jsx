@@ -18,7 +18,7 @@ const OnlineUpload = () => {
 
     alert("Gửi hồ sơ thành công!");
 
-    navigate("/physical-docs");
+    navigate("/officer");
   };
 
   return (

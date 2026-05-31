@@ -1,6 +1,18 @@
-import { useState } from "react";
+import { create } from "zustand";
 
-export function useAuthStore() {
-  const [user, setUser] = useState(null);
-  return { user, setUser };
-}
+const useAuthStore = create((set) => ({
+  user: {
+    name: "Nguyễn Văn A",
+    role: "admin", // admin | officer
+  },
+
+  setRole: (role) =>
+    set((state) => ({
+      user: {
+        ...state.user,
+        role,
+      },
+    })),
+}));
+
+export default useAuthStore;
