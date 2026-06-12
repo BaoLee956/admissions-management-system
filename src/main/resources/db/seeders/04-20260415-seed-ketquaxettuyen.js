@@ -29,7 +29,7 @@ module.exports = {
           gioiTinh: true,
           sdt: '0987654321',
           cccd: '123456789012',
-          email: 'nguyenvana@example.com',
+          email: 'hellotuilabao@gmail.com',
           diaChi: 'Hà Nội',
           khuVuc: 'KV1',
           doiTuongUuTien: 'ND1',

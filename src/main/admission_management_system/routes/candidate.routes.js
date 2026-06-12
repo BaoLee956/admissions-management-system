@@ -4,14 +4,16 @@ const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/candidate.controller');
 
-// 1. Import các middleware bảo mật vừa tạo
+// 1. Import các middleware bảo mật
 const { verifyToken, authorizeRoles } = require('../middlewares/auth.middleware');
+// 2. Import middleware upload kết nối Cloudinary (Đã làm ở Bước 4)
+const upload = require('../middlewares/upload.middleware');
 
 // ============================================
 // CANDIDATE PORTAL ROUTES
 // ============================================
 
-// API Tra cứu kết quả xét tuyển (Yêu cầu phải đăng nhập và phải có Role là CANDIDATE)
+// API Tra cứu kết quả xét tuyển
 router.get(
   '/me/admission-result', 
   verifyToken, 
@@ -19,8 +21,14 @@ router.get(
   controller.getAdmissionResult
 );
 
-// Bạn sẽ áp dụng tương tự cho các route bảo mật khác ở Tuần 2 và Tuần 3:
-// router.put('/me/confirm-enrollment', verifyToken, authorizeRoles(['CANDIDATE']), controller.confirmEnrollment);
-// router.post('/me/documents', verifyToken, authorizeRoles(['CANDIDATE']), controller.uploadDocument);
+// API Upload file giấy tờ (Đã mở comment và thêm middleware upload)
+// 'file' là key (tên trường) mà Frontend phải gửi lên qua form-data
+router.post(
+  '/me/documents', 
+  verifyToken, 
+  authorizeRoles(['CANDIDATE']), 
+  upload.single('file'), 
+  controller.uploadDocument
+);
 
 module.exports = router;

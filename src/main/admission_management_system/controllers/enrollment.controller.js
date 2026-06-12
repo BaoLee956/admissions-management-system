@@ -65,7 +65,7 @@ const submitDocuments = async (req, res) => {
           });
         }
 
-        const relativePath = `/uploads/${file.filename}`;
+        const relativePath = file.path;
 
         // Lưu/Cập nhật thông tin file vào Database
         await GiayToDinhKem.upsert({
