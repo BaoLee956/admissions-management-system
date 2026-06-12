@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import OfficerSidebar from "../../components/layout/OfficerSidebar";
 
 const AdmissionProcess = () => {
 
@@ -75,151 +76,73 @@ const AdmissionProcess = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f7fb] flex">
+
+    <div className="flex min-h-screen bg-[#f5f7fb]">
 
       {/* SIDEBAR */}
-      <div
-        className="
-          w-[240px]
-          bg-white
-          border-r
-          flex flex-col justify-between
-        "
-      >
-
-        <div>
-
-          {/* Logo */}
-          <div className="p-6 border-b">
-
-            <div className="flex items-center gap-3">
-
-              <img
-                src="/logo.png"
-                alt="PTIT"
-                className="w-10 h-10"
-              />
-
-              <div>
-
-                <h1 className="text-xl font-bold">
-                  EduAdmin
-                </h1>
-
-                <p className="text-sm text-gray-500">
-                  Tuyển sinh 2025
-                </p>
-
-              </div>
-
-            </div>
-
-          </div>
-
-          {/* Menu */}
-          <div className="p-4 space-y-2">
-
-            <button
-              className="
-                w-full text-left
-                px-4 py-3
-                rounded-xl
-                hover:bg-gray-100
-              "
-            >
-              Dashboard
-            </button>
-
-            <button
-              className="
-                w-full text-left
-                px-4 py-3
-                rounded-xl
-                bg-[#111827]
-                text-white
-              "
-            >
-              Hồ sơ tuyển sinh
-            </button>
-
-            <button
-              className="
-                w-full text-left
-                px-4 py-3
-                rounded-xl
-                hover:bg-gray-100
-              "
-            >
-              Xét tuyển
-            </button>
-
-            <button
-              className="
-                w-full text-left
-                px-4 py-3
-                rounded-xl
-                hover:bg-gray-100
-              "
-            >
-              Tiếp nhận
-            </button>
-
-          </div>
-
-        </div>
-
-        {/* User */}
-        <div className="p-4 border-t">
-
-          <p className="font-medium">
-            Nguyễn Văn A
-          </p>
-
-          <p className="text-sm text-gray-500">
-            admin@edu.vn
-          </p>
-
-        </div>
-
-      </div>
+      <OfficerSidebar />
 
       {/* MAIN */}
       <div className="flex-1 p-6">
 
-        {/* HEADER */}
-        <div className="mb-6">
+        {/* PAGE HEADER */}
+        <div className="flex justify-between items-center mb-6">
 
-          <p className="text-sm text-gray-400 mb-1">
-            Hồ sơ tuyển sinh {">"} Thực hiện xét tuyển
-          </p>
+          <div>
 
-          <h1 className="text-3xl font-bold">
-            Thực hiện Xét tuyển
-          </h1>
+            <p className="text-sm text-gray-400 mb-1">
+              Dashboard {">"} Xét tuyển
+            </p>
+
+            <h1 className="text-3xl font-bold">
+              Thực hiện Xét tuyển
+            </h1>
+
+          </div>
+
+          <div className="flex gap-3">
+
+            <div className="
+              bg-blue-100
+              text-blue-700
+              px-4 py-2
+              rounded-full
+              text-sm
+            ">
+              124 hồ sơ
+            </div>
+
+            <div className="
+              bg-green-100
+              text-green-700
+              px-4 py-2
+              rounded-full
+              text-sm
+            ">
+              52 trúng tuyển
+            </div>
+
+          </div>
 
         </div>
 
         {/* FILTER */}
-        <div
-          className="
-            bg-white
-            rounded-2xl
-            shadow-sm
-            p-5
-            mb-6
-            flex flex-wrap gap-4 items-end
-          "
-        >
+        <div className="
+          bg-white
+          rounded-2xl
+          shadow-sm
+          p-5
+          mb-6
+          flex flex-wrap gap-4 items-end
+        ">
 
-          {/* Batch */}
+          {/* BATCH */}
           <div>
 
-            <label
-              className="
-                block text-sm
-                text-gray-500 mb-2
-              "
-            >
+            <label className="
+              block text-sm
+              text-gray-500 mb-2
+            ">
               ĐỢT TUYỂN SINH
             </label>
 
@@ -229,7 +152,8 @@ const AdmissionProcess = () => {
               className="
                 border rounded-xl
                 px-4 py-3
-                min-w-[200px]
+                min-w-[220px]
+                outline-none
               "
             >
               <option>Đợt 1 - 2025</option>
@@ -238,15 +162,13 @@ const AdmissionProcess = () => {
 
           </div>
 
-          {/* Major */}
+          {/* MAJOR */}
           <div>
 
-            <label
-              className="
-                block text-sm
-                text-gray-500 mb-2
-              "
-            >
+            <label className="
+              block text-sm
+              text-gray-500 mb-2
+            ">
               NGÀNH HỌC
             </label>
 
@@ -257,6 +179,7 @@ const AdmissionProcess = () => {
                 border rounded-xl
                 px-4 py-3
                 min-w-[220px]
+                outline-none
               "
             >
               <option>Công nghệ thông tin</option>
@@ -267,15 +190,13 @@ const AdmissionProcess = () => {
 
           </div>
 
-          {/* Benchmark */}
+          {/* BENCHMARK */}
           <div>
 
-            <label
-              className="
-                block text-sm
-                text-gray-500 mb-2
-              "
-            >
+            <label className="
+              block text-sm
+              text-gray-500 mb-2
+            ">
               ĐIỂM CHUẨN
             </label>
 
@@ -290,12 +211,13 @@ const AdmissionProcess = () => {
                 border rounded-xl
                 px-4 py-3
                 w-[140px]
+                outline-none
               "
             />
 
           </div>
 
-          {/* Buttons */}
+          {/* BUTTON */}
           <div className="flex gap-3 ml-auto">
 
             <button
@@ -303,6 +225,7 @@ const AdmissionProcess = () => {
                 px-5 py-3
                 border rounded-xl
                 hover:bg-gray-100
+                transition
               "
             >
               Lọc kết quả
@@ -313,6 +236,7 @@ const AdmissionProcess = () => {
                 px-5 py-3
                 border rounded-xl
                 hover:bg-gray-100
+                transition
               "
             >
               Xuất Excel
@@ -326,6 +250,7 @@ const AdmissionProcess = () => {
                 bg-blue-600
                 text-white
                 hover:bg-blue-700
+                transition
               "
             >
               Công bố kết quả
@@ -336,34 +261,30 @@ const AdmissionProcess = () => {
         </div>
 
         {/* TABLE */}
-        <div
-          className="
-            bg-white
-            rounded-2xl
-            shadow-sm
-            overflow-hidden
-          "
-        >
+        <div className="
+          bg-white
+          rounded-2xl
+          shadow-sm
+          overflow-hidden
+        ">
 
-          {/* Table Header */}
-          <div
-            className="
-              flex justify-between items-center
-              p-5 border-b
-            "
-          >
+          {/* TABLE HEADER */}
+          <div className="
+            flex justify-between items-center
+            p-5 border-b
+          ">
 
             <h2 className="text-xl font-bold">
-              Danh sách Thí sinh Xét tuyển
+              Danh sách Thí sinh
             </h2>
 
             <div className="text-sm text-gray-500">
-              Tổng: 124 hồ sơ
+              Tổng: {students.length} hồ sơ
             </div>
 
           </div>
 
-          {/* Table */}
+          {/* TABLE CONTENT */}
           <div className="overflow-x-auto">
 
             <table className="w-full">
@@ -376,10 +297,12 @@ const AdmissionProcess = () => {
                   <th className="px-5 py-4">MÃ HỒ SƠ</th>
                   <th className="px-5 py-4">HỌ TÊN</th>
                   <th className="px-5 py-4">SỐ CCCD</th>
-                  <th className="px-5 py-4">NGÀNH ĐĂNG KÝ</th>
-                  <th className="px-5 py-4">ĐIỂM XÉT TUYỂN</th>
+                  <th className="px-5 py-4">NGÀNH</th>
+                  <th className="px-5 py-4">ĐIỂM</th>
                   <th className="px-5 py-4">TRẠNG THÁI</th>
-                  <th className="px-5 py-4">THAO TÁC</th>
+                  <th className="px-5 py-4 text-center">
+                    THAO TÁC
+                  </th>
 
                 </tr>
 
@@ -390,8 +313,12 @@ const AdmissionProcess = () => {
                 {students.map((student, index) => (
 
                   <tr
-                    key={index}
-                    className="border-t hover:bg-gray-50"
+                    key={student.id}
+                    className="
+                      border-t
+                      hover:bg-gray-50
+                      transition
+                    "
                   >
 
                     <td className="px-5 py-4">
@@ -442,8 +369,8 @@ const AdmissionProcess = () => {
 
                     </td>
 
-                    {/* BUTTON */}
-                    <td className="px-5 py-4">
+                    {/* ACTION */}
+                    <td className="px-5 py-4 text-center">
 
                       <button
                         onClick={() => navigate("/review")}
@@ -471,12 +398,10 @@ const AdmissionProcess = () => {
           </div>
 
           {/* FOOTER */}
-          <div
-            className="
-              flex justify-between items-center
-              p-5 border-t
-            "
-          >
+          <div className="
+            flex justify-between items-center
+            p-5 border-t
+          ">
 
             <p className="text-sm text-gray-500">
               Hiển thị 1 đến 5 của 124 kết quả
@@ -484,28 +409,43 @@ const AdmissionProcess = () => {
 
             <div className="flex gap-2">
 
-              <button className="w-9 h-9 rounded-lg border">
+              <button className="
+                w-9 h-9
+                rounded-lg border
+                hover:bg-gray-100
+              ">
                 {"<"}
               </button>
 
-              <button
-                className="
-                  w-9 h-9 rounded-lg
-                  bg-blue-600 text-white
-                "
-              >
+              <button className="
+                w-9 h-9
+                rounded-lg
+                bg-blue-600 text-white
+              ">
                 1
               </button>
 
-              <button className="w-9 h-9 rounded-lg border">
+              <button className="
+                w-9 h-9
+                rounded-lg border
+                hover:bg-gray-100
+              ">
                 2
               </button>
 
-              <button className="w-9 h-9 rounded-lg border">
+              <button className="
+                w-9 h-9
+                rounded-lg border
+                hover:bg-gray-100
+              ">
                 3
               </button>
 
-              <button className="w-9 h-9 rounded-lg border">
+              <button className="
+                w-9 h-9
+                rounded-lg border
+                hover:bg-gray-100
+              ">
                 {">"}
               </button>
 
