@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import OfficerSidebar from "../../components/layout/OfficerSidebar";
 
 const OnlineDocsReview = () => {
 
@@ -36,21 +37,21 @@ const OnlineDocsReview = () => {
     {
       name: "Trần Minh Khoa",
       id: "HS2024-00142",
-      major: "Khoa CNTT",
+      major: "CNTT",
       time: "08:32 sáng",
       status: "Chờ duyệt",
     },
     {
       name: "Nguyễn Thùy Linh",
       id: "HS2024-00143",
-      major: "Khoa Kinh tế",
+      major: "Kinh tế",
       time: "09:15 sáng",
       status: "Chờ duyệt",
     },
     {
       name: "Lê Quang Huy",
       id: "HS2024-00144",
-      major: "Khoa Luật",
+      major: "Luật",
       time: "09:47 sáng",
       status: "Chờ duyệt",
     },
@@ -64,8 +65,6 @@ const OnlineDocsReview = () => {
 
   const handleApprove = () => {
 
-    alert("Đã duyệt hồ sơ thành công!");
-
     const updatedDocs = docs.map((doc) => ({
       ...doc,
       status: "Hợp lệ",
@@ -73,9 +72,31 @@ const OnlineDocsReview = () => {
     }));
 
     setDocs(updatedDocs);
+
+    alert("Đã duyệt hồ sơ thành công!");
+
+    setTimeout(() => {
+      navigate("/physical-docs");
+    }, 500);
   };
 
   const handleRequest = () => {
+
+    const updatedDocs = docs.map((doc) => {
+
+      if (doc.color === "red") {
+        return {
+          ...doc,
+          status: "Yêu cầu bổ sung",
+          color: "gray",
+        };
+      }
+
+      return doc;
+    });
+
+    setDocs(updatedDocs);
+
     alert("Đã gửi yêu cầu bổ sung hồ sơ!");
   };
 
@@ -84,112 +105,13 @@ const OnlineDocsReview = () => {
     <div className="flex min-h-screen bg-[#f5f7fb]">
 
       {/* SIDEBAR */}
-      <div className="
-        w-[250px]
-        bg-white
-        border-r
-        flex flex-col justify-between
-      ">
-
-        <div>
-
-          {/* LOGO */}
-          <div className="p-6 border-b">
-
-            <div className="flex items-center gap-3">
-
-              <img
-                src="/logo.png"
-                alt="PTIT"
-                className="w-10 h-10"
-              />
-
-              <div>
-
-                <h1 className="font-bold text-lg">
-                  EduAdmin
-                </h1>
-
-                <p className="text-xs text-gray-500">
-                  Tuyển sinh 2025
-                </p>
-
-              </div>
-
-            </div>
-
-          </div>
-
-          {/* MENU */}
-          <div className="p-4 space-y-2">
-
-            <button className="
-              w-full text-left
-              px-4 py-3 rounded-xl
-              hover:bg-gray-100
-            ">
-              Dashboard
-            </button>
-
-            <button
-              onClick={() => navigate("/admission-process")}
-              className="
-                w-full text-left
-                px-4 py-3 rounded-xl
-                hover:bg-gray-100
-              "
-            >
-              Xét tuyển
-            </button>
-
-            <button className="
-              w-full text-left
-              px-4 py-3 rounded-xl
-              bg-[#111827]
-              text-white
-            ">
-              Duyệt hồ sơ
-            </button>
-
-            <button
-              onClick={() => navigate("/physical-docs")}
-              className="
-                w-full text-left
-                px-4 py-3 rounded-xl
-                hover:bg-gray-100
-              "
-            >
-              Tiếp nhận bản cứng
-            </button>
-
-          </div>
-
-        </div>
-
-        {/* USER */}
-        <div className="p-4 border-t">
-
-          <p className="font-medium">
-            Nguyễn Văn A
-          </p>
-
-          <p className="text-sm text-gray-500">
-            admin@edu.vn
-          </p>
-
-        </div>
-
-      </div>
+      <OfficerSidebar />
 
       {/* MAIN */}
       <div className="flex-1 p-6">
 
         {/* HEADER */}
-        <div className="
-          flex justify-between
-          items-center
-          mb-6
-        ">
+        <div className="flex justify-between items-center mb-6">
 
           <div>
 
@@ -208,7 +130,8 @@ const OnlineDocsReview = () => {
             <div className="
               bg-yellow-100
               text-yellow-700
-              px-4 py-2 rounded-full
+              px-4 py-2
+              rounded-full
               text-sm
             ">
               24 hồ sơ chờ duyệt
@@ -217,7 +140,8 @@ const OnlineDocsReview = () => {
             <div className="
               bg-green-100
               text-green-700
-              px-4 py-2 rounded-full
+              px-4 py-2
+              rounded-full
               text-sm
             ">
               156 đã duyệt hôm nay
@@ -248,6 +172,7 @@ const OnlineDocsReview = () => {
                 rounded-xl
                 px-4 py-3
                 mb-4
+                outline-none
               "
             />
 
@@ -279,24 +204,28 @@ const OnlineDocsReview = () => {
                       {item.name}
                     </h3>
 
-                    <span className="
-                      text-xs
-                      text-yellow-600
-                    ">
+                    <span
+                      className={`
+                        text-xs
+                        px-2 py-1
+                        rounded-full
+                        ${
+                          item.status === "Chờ duyệt"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : "bg-green-100 text-green-700"
+                        }
+                      `}
+                    >
                       {item.status}
                     </span>
 
                   </div>
 
-                  <p className="
-                    text-sm text-gray-500 mt-1
-                  ">
+                  <p className="text-sm text-gray-500 mt-1">
                     {item.id}
                   </p>
 
-                  <p className="
-                    text-sm text-gray-500
-                  ">
+                  <p className="text-sm text-gray-500">
                     {item.major} • {item.time}
                   </p>
 
@@ -334,10 +263,11 @@ const OnlineDocsReview = () => {
                     onClick={() => setActiveDoc("cccd")}
                     className={`
                       px-3 py-2 rounded-lg
+                      transition
                       ${
                         activeDoc === "cccd"
                           ? "bg-blue-500 text-white"
-                          : "bg-gray-100"
+                          : "bg-gray-100 hover:bg-gray-200"
                       }
                     `}
                   >
@@ -348,10 +278,11 @@ const OnlineDocsReview = () => {
                     onClick={() => setActiveDoc("hocba")}
                     className={`
                       px-3 py-2 rounded-lg
+                      transition
                       ${
                         activeDoc === "hocba"
                           ? "bg-blue-500 text-white"
-                          : "bg-gray-100"
+                          : "bg-gray-100 hover:bg-gray-200"
                       }
                     `}
                   >
@@ -362,10 +293,11 @@ const OnlineDocsReview = () => {
                     onClick={() => setActiveDoc("gks")}
                     className={`
                       px-3 py-2 rounded-lg
+                      transition
                       ${
                         activeDoc === "gks"
                           ? "bg-blue-500 text-white"
-                          : "bg-gray-100"
+                          : "bg-gray-100 hover:bg-gray-200"
                       }
                     `}
                   >
@@ -386,10 +318,14 @@ const OnlineDocsReview = () => {
                 <img
                   src={docImages[activeDoc]}
                   alt="preview"
+                  onError={(e) => {
+                    e.target.src = "/placeholder.png";
+                  }}
                   className="
                     h-[350px]
                     rounded-xl
                     shadow-lg
+                    object-contain
                   "
                 />
 
@@ -405,10 +341,7 @@ const OnlineDocsReview = () => {
               p-5
             ">
 
-              <h2 className="
-                font-semibold
-                mb-4
-              ">
+              <h2 className="font-semibold mb-4">
                 Kiểm tra hồ sơ & Phê duyệt
               </h2>
 
@@ -428,7 +361,7 @@ const OnlineDocsReview = () => {
                           ? "bg-green-50 border-green-200"
                           : doc.color === "red"
                           ? "bg-red-50 border-red-200"
-                          : "bg-gray-50"
+                          : "bg-gray-50 border-gray-200"
                       }
                     `}
                   >
@@ -439,24 +372,24 @@ const OnlineDocsReview = () => {
                         {doc.name}
                       </p>
 
-                      <p className="
-                        text-sm text-gray-500
-                      ">
+                      <p className="text-sm text-gray-500">
                         Kiểm tra tài liệu
                       </p>
 
                     </div>
 
-                    <span className={`
-                      text-sm font-medium
-                      ${
-                        doc.color === "green"
-                          ? "text-green-600"
-                          : doc.color === "red"
-                          ? "text-red-600"
-                          : "text-gray-500"
-                      }
-                    `}>
+                    <span
+                      className={`
+                        text-sm font-medium
+                        ${
+                          doc.color === "green"
+                            ? "text-green-600"
+                            : doc.color === "red"
+                            ? "text-red-600"
+                            : "text-gray-500"
+                        }
+                      `}
+                    >
                       {doc.status}
                     </span>
 
@@ -480,6 +413,7 @@ const OnlineDocsReview = () => {
                     border border-orange-400
                     text-orange-500
                     hover:bg-orange-50
+                    transition
                   "
                 >
                   Yêu cầu bổ sung
@@ -493,6 +427,7 @@ const OnlineDocsReview = () => {
                     bg-green-600
                     text-white
                     hover:bg-green-700
+                    transition
                   "
                 >
                   Duyệt hồ sơ

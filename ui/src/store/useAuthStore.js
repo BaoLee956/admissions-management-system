@@ -19,6 +19,14 @@ const useAuthStore = create((set) => ({
     localStorage.removeItem('userRole');
     set({ user: null, token: null, role: null, isAuthenticated: false });
   },
+
+  setRole: (role) =>
+    set((state) => ({
+      user: {
+        ...state.user,
+        role,
+      },
+    })),
 }));
 
 export default useAuthStore;

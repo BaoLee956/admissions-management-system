@@ -29,7 +29,7 @@ const AdminLogin = () => {
       alert("Đăng nhập thành công!");
 
       // Sau login -> sang màn xét tuyển
-      navigate("/admission-process");
+      navigate("/admin-dashboard");
 
     } else {
 
