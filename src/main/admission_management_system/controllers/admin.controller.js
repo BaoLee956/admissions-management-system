@@ -1,7 +1,5 @@
-'use strict';
-
 const db = require('../models');
-const { Nganh, Khoa, DotTuyenSinh, HoSoNhapHoc, GiayToDinhKem, YeuCauPheDuyet, ThiSinh } = db;
+const { Nganh, Khoa, DotTuyenSinh, HoSoNhapHoc, GiayToDinhKem, YeuCauPheDuyet, ThiSinh, NhanVien } = db;
 
 module.exports = {
   // =========================
@@ -219,6 +217,129 @@ module.exports = {
       return res.status(200).json({ success: true, message: 'Phê duyệt thành công', data: yeuCau });
     } catch (error) {
       await transaction.rollback();
+      return res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
+    }
+  },
+
+  async getAllUsers(req, res) {
+    try {
+      const listUsers = await NhanVien.findAll({
+        include: [{
+          model: db.NhomQuyen,
+          as: 'nhomQuyen'
+        }],
+        order: [['createdAt', 'DESC']]
+      });
+      return res.status(200).json({ success: true, data: listUsers });
+    } catch (error) {
+      return res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
+    }
+  },
+
+  async createUser(req, res) {
+    try {
+      const { hoTen, email, role } = req.body;
+      if (!hoTen || !email || !role) {
+        return res.status(400).json({ success: false, message: 'Thiếu thông tin hoTen, email hoặc role' });
+      }
+
+      const existing = await NhanVien.findOne({ where: { email } });
+      if (existing) {
+        return res.status(400).json({ success: false, message: 'Email đã được sử dụng' });
+      }
+
+      if (role === 'Admin') {
+        return res.status(400).json({ success: false, message: 'Bạn không có quyền tạo tài khoản Admin thứ hai.' });
+      }
+
+      let groupName = 'Officer';
+
+      const group = await db.NhomQuyen.findOne({ where: { tenNhom: groupName } });
+      if (!group) {
+        return res.status(404).json({ success: false, message: `Không tìm thấy nhóm quyền ${groupName}` });
+      }
+
+      const matKhau = Math.floor(10000000 + Math.random() * 90000000).toString();
+
+      const newUser = await NhanVien.create({
+        hoTen,
+        email,
+        matKhau,
+        maNhom: group.maNhom,
+        trangThai: true
+      });
+
+      return res.status(201).json({
+        success: true,
+        message: 'Tạo tài khoản thành công',
+        data: {
+          maNhanVien: newUser.maNhanVien,
+          hoTen: newUser.hoTen,
+          email: newUser.email,
+          matKhau,
+          role: groupName,
+          trangThai: newUser.trangThai,
+          createdAt: newUser.createdAt
+        }
+      });
+    } catch (error) {
+      return res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
+    }
+  },
+
+  async toggleUserStatus(req, res) {
+    try {
+      const user = await NhanVien.findByPk(req.params.id);
+      if (!user) {
+        return res.status(404).json({ success: false, message: 'Không tìm thấy tài khoản' });
+      }
+      user.trangThai = !user.trangThai;
+      await user.save();
+      return res.status(200).json({ success: true, message: 'Cập nhật trạng thái thành công', data: user });
+    } catch (error) {
+      return res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
+    }
+  },
+
+  async resetUserPassword(req, res) {
+    try {
+      const user = await NhanVien.findByPk(req.params.id);
+      if (!user) {
+        return res.status(404).json({ success: false, message: 'Không tìm thấy tài khoản' });
+      }
+      const newPassword = Math.floor(10000000 + Math.random() * 90000000).toString();
+      user.matKhau = newPassword;
+      await user.save();
+      return res.status(200).json({
+        success: true,
+        message: `Reset mật khẩu thành công cho ${user.hoTen}`,
+        newPassword
+      });
+    } catch (error) {
+      return res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
+    }
+  },
+
+  async deleteUser(req, res) {
+    try {
+      const user = await NhanVien.findByPk(req.params.id, {
+        include: [{
+          model: db.NhomQuyen,
+          as: 'nhomQuyen'
+        }]
+      });
+
+      if (!user) {
+        return res.status(404).json({ success: false, message: 'Không tìm thấy tài khoản' });
+      }
+
+      if (user.nhomQuyen && user.nhomQuyen.tenNhom === 'Admin') {
+        return res.status(400).json({ success: false, message: 'Không thể xóa tài khoản Quản trị viên (Admin)' });
+      }
+
+      await user.destroy();
+      return res.status(200).json({ success: true, message: 'Xóa tài khoản thành công' });
+    } catch (error) {
       return res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
     }
   }

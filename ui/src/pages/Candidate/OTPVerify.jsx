@@ -32,6 +32,37 @@ const OTPVerify = () => {
   const handleKeyDown = (e, index) => {
     if (e.key === "Backspace" && !otp[index] && index > 0) {
       inputsRef.current[index - 1].focus();
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      handleVerifyOTP();
+    }
+  };
+
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pasteData = e.clipboardData.getData("text").trim();
+    const numericDigits = pasteData.replace(/\D/g, "").slice(0, 6);
+
+    if (numericDigits.length === 6) {
+      const newOtp = numericDigits.split("");
+      setOtp(newOtp);
+      setErrorMsg("");
+      if (inputsRef.current[5]) {
+        inputsRef.current[5].focus();
+      }
+    } else if (numericDigits.length > 0) {
+      const newOtp = [...otp];
+      for (let i = 0; i < numericDigits.length; i++) {
+        if (i < 6) {
+          newOtp[i] = numericDigits[i];
+        }
+      }
+      setOtp(newOtp);
+      setErrorMsg("");
+      const focusIndex = Math.min(numericDigits.length, 5);
+      if (inputsRef.current[focusIndex]) {
+        inputsRef.current[focusIndex].focus();
+      }
     }
   };
 
@@ -101,6 +132,7 @@ const OTPVerify = () => {
               value={digit}
               onChange={(e) => handleChange(e.target.value, index)}
               onKeyDown={(e) => handleKeyDown(e, index)}
+              onPaste={handlePaste}
               className="w-12 h-12 text-center text-lg border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
             />
           ))}

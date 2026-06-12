@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 /**
  * Middleware kiểm tra tính hợp lệ của JWT Token
  */
-const verifyToken = (req, res, next) => {
+const verifyToken = async (req, res, next) => {
   const authHeader = req.headers.authorization || req.headers.Authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -19,6 +19,23 @@ const verifyToken = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded; 
+
+    // Kiểm tra tài khoản nội bộ có bị khóa (trangThai = false) hay không
+    if (decoded.maNhanVien) {
+      const { NhanVien } = require('../models');
+      const user = await NhanVien.findByPk(decoded.maNhanVien);
+      if (!user) {
+        return res.status(401).json({
+          error: { code: 'USER_NOT_FOUND', message: 'Tài khoản không tồn tại trong hệ thống.' }
+        });
+      }
+      if (!user.trangThai) {
+        return res.status(403).json({
+          error: { code: 'USER_LOCKED', message: 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.' }
+        });
+      }
+    }
+
     next();
   } catch (error) {
     return res.status(401).json({

@@ -27,4 +27,11 @@ router.post('/upload-giay-to', AdminController.uploadGiayTo);
 router.get('/requests/pending', AdminController.getPendingRequests);
 router.put('/requests/:id/handle', AdminController.handleApprovalRequest);
 
+// NHAN VIEN (USER MANAGEMENT)
+router.get('/users', AdminController.getAllUsers);
+router.post('/users', AdminController.createUser);
+router.put('/users/:id/toggle', AdminController.toggleUserStatus);
+router.put('/users/:id/reset-password', AdminController.resetUserPassword);
+router.delete('/users/:id', AdminController.deleteUser);
+
 module.exports = router;

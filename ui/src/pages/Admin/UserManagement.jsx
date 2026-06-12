@@ -1,59 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AdminSidebar from "../../components/layout/AdminSidebar";
+import apiClient from "../../services/apiClient";
 
 const UserManagement = () => {
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      name: "Nguyễn Văn An",
-      email: "an.nguyen@edu.vn",
-      role: "Admin",
-      active: true,
-      joinDate: "01/01/2024",
-    },
-    {
-      id: 2,
-      name: "Trần Thị Bích",
-      email: "bich.tran@edu.vn",
-      role: "Admin",
-      active: true,
-      joinDate: "03/02/2024",
-    },
-    {
-      id: 3,
-      name: "Lê Thu Hương",
-      email: "huong.le@edu.vn",
-      role: "Cán bộ tuyển sinh",
-      active: true,
-      joinDate: "10/03/2024",
-    },
-    {
-      id: 4,
-      name: "Phạm Minh Đức",
-      email: "duc.pham@edu.vn",
-      role: "Cán bộ tuyển sinh",
-      active: true,
-      joinDate: "15/03/2024",
-    },
-    {
-      id: 5,
-      name: "Hoàng Minh Châu",
-      email: "chau.hoang@edu.vn",
-      role: "Cán bộ nhập liệu",
-      active: true,
-      joinDate: "20/04/2024",
-    },
-    {
-      id: 6,
-      name: "Vũ Đình Nam",
-      email: "nam.vu@edu.vn",
-      role: "Cán bộ tuyển sinh",
-      active: false,
-      joinDate: "05/05/2024",
-    },
-  ]);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showCredentialsModal, setShowCredentialsModal] = useState(false);
+  const [credentials, setCredentials] = useState({ email: "", password: "", title: "" });
 
   const [newUser, setNewUser] = useState({
     name: "",
@@ -61,42 +16,120 @@ const UserManagement = () => {
     role: "Cán bộ tuyển sinh",
   });
 
-  const handleToggle = (id) => {
-    setUsers((prev) =>
-      prev.map((user) =>
-        user.id === id
-          ? { ...user, active: !user.active }
-          : user
-      )
-    );
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const response = await apiClient.get("/admin/users");
+      if (response.data && response.data.success) {
+        const mapped = response.data.data.map(u => ({
+          id: u.maNhanVien,
+          name: u.hoTen,
+          email: u.email,
+          role: u.nhomQuyen ? (u.nhomQuyen.tenNhom === "Admin" ? "Admin" : "Cán bộ tuyển sinh") : "Cán bộ tuyển sinh",
+          active: u.trangThai,
+          joinDate: new Date(u.createdAt).toLocaleDateString("vi-VN"),
+        }));
+        setUsers(mapped);
+      }
+    } catch (error) {
+      console.error("Lỗi khi tải danh sách người dùng", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleResetPassword = (name) => {
-    alert(`Đã reset mật khẩu cho ${name}`);
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const handleToggle = async (id) => {
+    try {
+      const response = await apiClient.put(`/admin/users/${id}/toggle`);
+      if (response.data && response.data.success) {
+        setUsers((prev) =>
+          prev.map((user) =>
+            user.id === id
+              ? { ...user, active: !user.active }
+              : user
+          )
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Lỗi khi cập nhật trạng thái tài khoản");
+    }
   };
 
-  const handleCreateUser = () => {
+  const handleResetPassword = async (id, name) => {
+    try {
+      const response = await apiClient.put(`/admin/users/${id}/reset-password`);
+      if (response.data && response.data.success) {
+        setCredentials({
+          email: name,
+          password: response.data.newPassword,
+          title: "Reset mật khẩu thành công!",
+        });
+        setShowCredentialsModal(true);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Lỗi khi reset mật khẩu");
+    }
+  };
+
+  const handleDeleteUser = async (id, name) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa tài khoản của "${name}" không?`)) {
+      return;
+    }
+
+    try {
+      const response = await apiClient.delete(`/admin/users/${id}`);
+      if (response.data && response.data.success) {
+        alert("Xóa tài khoản thành công!");
+        await fetchUsers();
+      }
+    } catch (error) {
+      console.error(error);
+      alert(error.response?.data?.message || "Lỗi khi xóa tài khoản");
+    }
+  };
+
+  const handleCreateUser = async () => {
     if (!newUser.name || !newUser.email) {
       alert("Vui lòng nhập đầy đủ thông tin");
       return;
     }
 
-    const user = {
-      id: Date.now(),
-      ...newUser,
-      active: true,
-      joinDate: new Date().toLocaleDateString(),
-    };
+    try {
+      const response = await apiClient.post("/admin/users", {
+        hoTen: newUser.name,
+        email: newUser.email,
+        role: "Officer", // Admin can only create Officer accounts
+      });
 
-    setUsers([...users, user]);
+      if (response.data && response.data.success) {
+        const created = response.data.data;
+        setCredentials({
+          email: created.email,
+          password: created.matKhau,
+          title: "Tạo tài khoản thành công!",
+        });
+        setShowCredentialsModal(true);
 
-    setNewUser({
-      name: "",
-      email: "",
-      role: "Cán bộ tuyển sinh",
-    });
+        await fetchUsers();
 
-    setShowCreateModal(false);
+        setNewUser({
+          name: "",
+          email: "",
+          role: "Cán bộ tuyển sinh",
+        });
+
+        setShowCreateModal(false);
+      }
+    } catch (error) {
+      console.error(error);
+      alert(error.response?.data?.message || "Lỗi khi tạo tài khoản");
+    }
   };
 
   const totalUsers = users.length;
@@ -193,7 +226,7 @@ const UserManagement = () => {
                 <th className="px-5 py-4">STT</th>
                 <th className="px-5 py-4">HỌ TÊN</th>
                 <th className="px-5 py-4">EMAIL</th>
-                <th className="px-5 py-4">VAI TRÒ</th>
+                <th className="px-5 py-4 text-center">VAI TRÒ</th>
                 <th className="px-5 py-4">TRẠNG THÁI</th>
                 <th className="px-5 py-4 text-center">
                   THAO TÁC
@@ -234,18 +267,16 @@ const UserManagement = () => {
                     {user.email}
                   </td>
 
-                  <td className="px-5 py-4">
-
+                  <td className="px-5 py-4 text-center">
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      className={`inline-block w-40 text-center py-1.5 rounded-full text-xs font-semibold border ${
                         user.role === "Admin"
-                          ? "bg-purple-100 text-purple-700"
-                          : "bg-blue-100 text-blue-700"
+                          ? "bg-purple-50 text-purple-700 border-purple-200"
+                          : "bg-blue-50 text-blue-700 border-blue-200"
                       }`}
                     >
                       {user.role}
                     </span>
-
                   </td>
 
                   <td className="px-5 py-4">
@@ -258,10 +289,9 @@ const UserManagement = () => {
                         }
                         className={`
                           w-12 h-6 rounded-full relative transition
-                          ${
-                            user.active
-                              ? "bg-blue-500"
-                              : "bg-gray-300"
+                          ${user.active
+                            ? "bg-blue-500"
+                            : "bg-gray-300"
                           }
                         `}
                       >
@@ -273,10 +303,9 @@ const UserManagement = () => {
                             bg-white
                             rounded-full
                             transition-all
-                            ${
-                              user.active
-                                ? "left-7"
-                                : "left-1"
+                            ${user.active
+                              ? "left-7"
+                              : "left-1"
                             }
                           `}
                         />
@@ -284,11 +313,10 @@ const UserManagement = () => {
                       </button>
 
                       <span
-                        className={`text-sm ${
-                          user.active
+                        className={`text-sm ${user.active
                             ? "text-green-600"
                             : "text-red-500"
-                        }`}
+                          }`}
                       >
                         {user.active
                           ? "Hoạt động"
@@ -301,11 +329,12 @@ const UserManagement = () => {
 
                   <td className="px-5 py-4">
 
-                    <div className="flex justify-center">
+                    <div className="flex justify-center gap-2">
 
                       <button
                         onClick={() =>
                           handleResetPassword(
+                            user.id,
                             user.name
                           )
                         }
@@ -320,6 +349,27 @@ const UserManagement = () => {
                       >
                         🔑 Reset MK
                       </button>
+
+                      {user.role !== "Admin" && (
+                        <button
+                          onClick={() =>
+                            handleDeleteUser(
+                              user.id,
+                              user.name
+                            )
+                          }
+                          className="
+                            bg-red-100
+                            text-red-700
+                            px-3 py-2
+                            rounded-lg
+                            text-sm
+                            hover:bg-red-200
+                          "
+                        >
+                          🗑️ Xóa
+                        </button>
+                      )}
 
                     </div>
 
@@ -411,10 +461,6 @@ const UserManagement = () => {
                   "
                 >
                   <option>
-                    Admin
-                  </option>
-
-                  <option>
                     Cán bộ tuyển sinh
                   </option>
 
@@ -457,6 +503,70 @@ const UserManagement = () => {
 
             </div>
 
+          </div>
+        )}
+
+        {/* CREDENTIALS MODAL (COPYABLE) */}
+        {showCredentialsModal && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+            <div className="bg-white w-[450px] rounded-2xl p-6 shadow-2xl relative">
+              <h2 className="text-2xl font-bold mb-4 text-green-600">
+                {credentials.title}
+              </h2>
+
+              <div className="space-y-4 mb-6">
+                <div>
+                  <label className="text-xs text-gray-400 block mb-1">TÀI KHOẢN (EMAIL)</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      readOnly
+                      value={credentials.email}
+                      className="flex-1 bg-gray-50 border rounded-xl px-4 py-2 text-gray-700 outline-none"
+                    />
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(credentials.email);
+                        alert("Đã sao chép email!");
+                      }}
+                      className="bg-gray-100 hover:bg-gray-200 px-3 rounded-xl text-sm font-medium"
+                    >
+                      Sao chép
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs text-gray-400 block mb-1">MẬT KHẨU MỚI</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      readOnly
+                      value={credentials.password}
+                      className="flex-1 bg-gray-50 border border-green-200 font-mono font-bold text-green-700 rounded-xl px-4 py-2 outline-none text-lg"
+                    />
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(credentials.password);
+                        alert("Đã sao chép mật khẩu!");
+                      }}
+                      className="bg-green-100 hover:bg-green-200 text-green-700 font-semibold px-3 rounded-xl text-sm"
+                    >
+                      Sao chép
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setShowCredentialsModal(false)}
+                  className="bg-blue-600 text-white px-6 py-2.5 rounded-xl hover:bg-blue-700 font-semibold"
+                >
+                  Đóng
+                </button>
+              </div>
+            </div>
           </div>
         )}
 

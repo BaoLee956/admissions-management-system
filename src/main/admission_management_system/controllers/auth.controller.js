@@ -109,7 +109,7 @@ module.exports = {
 
       const { NhanVien, NhomQuyen } = require('../models');
       const nhanVien = await NhanVien.findOne({
-        where: { email, trangThai: true },
+        where: { email },
         include: [{
           model: NhomQuyen,
           as: 'nhomQuyen'
@@ -118,6 +118,10 @@ module.exports = {
 
       if (!nhanVien) {
         return res.status(401).json({ error: { message: 'Email hoặc mật khẩu không chính xác' } });
+      }
+
+      if (!nhanVien.trangThai) {
+        return res.status(403).json({ error: { message: 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.' } });
       }
 
       if (nhanVien.matKhau !== password) {
