@@ -68,6 +68,31 @@ module.exports = {
       ], {});
     }
 
+    const candidate3 = await queryInterface.sequelize.query(
+      'SELECT sbd FROM "ThiSinh" WHERE sbd = \'87654321\' LIMIT 1',
+      { type: queryInterface.sequelize.QueryTypes.SELECT }
+    );
+
+    if (candidate3.length === 0) {
+      await queryInterface.bulkInsert('ThiSinh', [
+        {
+          sbd: '87654321',
+          hoTen: 'Nguyễn Văn Đậu',
+          ngaySinh: new Date('2005-01-04'),
+          gioiTinh: true,
+          sdt: '0987654621',
+          cccd: '123456798012',
+          email: 'vototti2005@gmail.com',
+          diaChi: 'Đà Nẵng',
+          khuVuc: 'KV2',
+          doiTuongUuTien: 'ND2',
+          otp_code: '123456',
+          otp_expires: new Date(Date.now() + 3600000),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }
+      ], {});
+    }
     // 3. Insert KetQuaXetTuyen
     await queryInterface.bulkInsert('KetQuaXetTuyen', [
       {
@@ -93,14 +118,26 @@ module.exports = {
         trangThai: 'KHÔNG TRÚNG TUYỂN',
         createdAt: new Date(),
         updatedAt: new Date(),
+      },
+      {
+        sbd: '87654321',
+        maNganh: '7480201',
+        diemToan: 10.0,
+        diemLy: 9.5,
+        diemHoa: 8.5,
+        diemCong: 1.0,
+        tongDiem: 29.0,
+        trangThai: 'TRÚNG TUYỂN',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }
     ], {});
   },
 
   async down(queryInterface) {
     // Delete in reverse order of foreign key dependencies
-    await queryInterface.bulkDelete('KetQuaXetTuyen', { sbd: ['12345678', '88889999'] }, {});
-    await queryInterface.bulkDelete('ThiSinh', { sbd: ['12345678', '88889999'] }, {});
+    await queryInterface.bulkDelete('KetQuaXetTuyen', { sbd: ['12345678', '88889999', '87654321'] }, {});
+    await queryInterface.bulkDelete('ThiSinh', { sbd: ['12345678', '88889999', '87654321'] }, {});
     await queryInterface.bulkDelete('NganhHoc', { maNganh: '7480201' }, {});
   },
 };

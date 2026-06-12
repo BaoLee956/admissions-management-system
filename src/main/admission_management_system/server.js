@@ -10,6 +10,7 @@ const db = require('./models');
 
 const PORT = Number(process.env.PORT || 4000);
 
+
 // 3. Thực hiện kết nối tới Database trước
 db.sequelize.authenticate()
   .then(() => {
@@ -23,6 +24,7 @@ db.sequelize.authenticate()
     console.log('✅ Đồng bộ cấu trúc bảng dữ liệu thành công!');
     
     // 5. Khởi động server Express sau khi DB đã sẵn sàng hoàn toàn
+
     app.listen(PORT, () => {
       console.log(`Backend listening on http://localhost:${PORT}`);
     });

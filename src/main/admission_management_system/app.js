@@ -1,5 +1,6 @@
 'use strict';
 const path = require('path');
+const excelRoutes = require("./routes/excel.routes");
 require('dotenv').config({
     path: path.join(__dirname, '.env')
 });
@@ -22,5 +23,5 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 app.use('/api', routes);
-
+app.use("/api/excel", excelRoutes);
 module.exports = app;
