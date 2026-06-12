@@ -19,7 +19,7 @@ module.exports = {
       },
 
       maNganh: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: false,
         references: { model: 'Nganh', key: 'maNganh' },
         onUpdate: 'CASCADE',

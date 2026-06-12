@@ -4,9 +4,9 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Nganh', {
       maNganh: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         primaryKey: true,
-        autoIncrement: true,
+        autoIncrement: false,
         allowNull: false,
       },
 

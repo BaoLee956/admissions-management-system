@@ -7,6 +7,7 @@ import PhysicalDocs from "./pages/Officer/PhysicalDocs";
 import OnlineDocsReview from "./pages/Officer/OnlineDocsReview";
 import AdmissionProcess from "./pages/Officer/AdmissionProcess";
 import AdminLogin from "./pages/Admin/AdminLogin";
+import ProtectedRoute from "./components/ProtectedRoute";
 import StudentReception from "./pages/Officer/StudentReception";
 import ApprovalRequests from "./pages/Admin/ApprovalRequests";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
@@ -16,14 +17,23 @@ import DataImport from "./pages/Admin/DataImport";
 import MasterData from "./pages/admin/MasterData";
 import UserManagement from "./pages/admin/UserManagement";
 import ReportExport from "./pages/Admin/ReportExport";
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public Candidate Routes */}
         <Route path="/" element={<SearchPortal />} />
         <Route path="/otp" element={<OTPVerify />} />
-        <Route path="/result" element={<AdmissionResult />} />
-        <Route path="/upload" element={<OnlineUpload />} />
+
+        {/* Protected Candidate Routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/result" element={<AdmissionResult />} />
+          <Route path="/ket-qua" element={<AdmissionResult />} />
+          <Route path="/upload" element={<OnlineUpload />} />
+        </Route>
+
+        {/* Officer & Admin Routes */}
         <Route path="/physical-docs" element={<PhysicalDocs />}/>
         <Route path="/review" element={<OnlineDocsReview />} />
         <Route path="/admission-process" element={<AdmissionProcess />} />

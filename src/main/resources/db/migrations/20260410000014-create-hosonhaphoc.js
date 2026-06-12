@@ -11,18 +11,30 @@ module.exports = {
       },
 
       sbd: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: false,
         unique: true, // 🔥 mỗi thí sinh 1 hồ sơ
         references: { model: 'ThiSinh', key: 'sbd' },
         onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
+        onDelete: 'RESTRICT',
+      },
+      nguoiDuyet:{
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: { model: 'NhanVien', key: 'maNhanVien' },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
       },
 
       trangThai: {
         type: Sequelize.STRING,
         allowNull: false,
         defaultValue: 'PENDING',
+      },
+
+      ngayNop: {
+        type: Sequelize.DATE,
+        allowNull: false,
       },
 
       createdAt: {

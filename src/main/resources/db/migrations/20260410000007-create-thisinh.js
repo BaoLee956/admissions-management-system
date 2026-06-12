@@ -5,10 +5,15 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('ThiSinh', {
       sbd: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         primaryKey: true,
-        autoIncrement: true,
+        autoIncrement: false,
         allowNull: false,
+      },
+      cccd: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique : true,
       },
       hoTen: {
         type: Sequelize.STRING,
@@ -42,6 +47,14 @@ module.exports = {
       },
       doiTuongUuTien: {
         type: Sequelize.STRING,
+        allowNull: false,
+      },
+      otp_code: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      otp_expires: {
+        type: Sequelize.DATE,
         allowNull: false,
       },
       createdAt: {

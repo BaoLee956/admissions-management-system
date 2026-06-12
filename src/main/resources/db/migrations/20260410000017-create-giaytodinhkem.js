@@ -36,6 +36,11 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      
+      ghiChuLoi: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
 
       createdAt: {
         type: Sequelize.DATE,

@@ -1,8 +1,8 @@
 'use strict';
 
-module.exports = function ChiTietDiemModel(sequelize, DataTypes) {
-  const ChiTietDiem = sequelize.define(
-    'ChiTietDiem',
+module.exports = function CauHinhXetTuyenModel(sequelize, DataTypes) {
+  const CauHinhXetTuyen = sequelize.define(
+    'CauHinhXetTuyen',
     {
       id: {
         type: DataTypes.INTEGER,
@@ -10,28 +10,28 @@ module.exports = function ChiTietDiemModel(sequelize, DataTypes) {
         autoIncrement: true,
         allowNull: false,
       },
-      sbd: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        references: {
-          model: 'ThiSinh',
-          key: 'sbd',
-        },
-      },
-      maMon: {
+      maToHop: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: 'MonHoc',
-          key: 'maMon',
+          model: 'ToHopMon',
+          key: 'maToHop',
         },
       },
-      diemSo: {
-        type: DataTypes.FLOAT,
+      maNganh: {
+        type: DataTypes.STRING,
         allowNull: false,
-        validate: {
-          min: 0,
-          max: 10,
+        references: {
+          model: 'Nganh',
+          key: 'maNganh',
+        },
+      },
+      maDot: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'DotTuyenSinh',
+          key: 'maDot',
         },
       },
       createdAt: {
@@ -46,10 +46,10 @@ module.exports = function ChiTietDiemModel(sequelize, DataTypes) {
       },
     },
     {
-      tableName: 'ChiTietDiem',
+      tableName: 'CauHinhXetTuyen',
       timestamps: true,
     }
   );
 
-  return ChiTietDiem;
+  return CauHinhXetTuyen;
 };

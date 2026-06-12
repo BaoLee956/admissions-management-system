@@ -1,22 +1,20 @@
 'use strict';
 
-module.exports = function LoaiGiayToModel(sequelize, DataTypes) {
-  const LoaiGiayTo = sequelize.define(
-    'LoaiGiayTo',
+module.exports = function NganhHocModel(sequelize, DataTypes) {
+  const NganhHoc = sequelize.define(
+    'NganhHoc',
     {
-      maLoai: {
-        type: DataTypes.INTEGER,
+      maNganh: {
+        type: DataTypes.STRING,
         primaryKey: true,
-        autoIncrement: true,
         allowNull: false,
       },
-      tenLoai: {
+      tenNganh: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
       },
-      batBuoc: {
-        type: DataTypes.BOOLEAN,
+      diemChuan: {
+        type: DataTypes.FLOAT,
         allowNull: false,
       },
       createdAt: {
@@ -31,14 +29,17 @@ module.exports = function LoaiGiayToModel(sequelize, DataTypes) {
       },
     },
     {
-      tableName: 'LoaiGiayTo',
+      tableName: 'NganhHoc',
       timestamps: true,
     }
   );
-  LoaiGiayTo.associate = (models) => {
-    LoaiGiayTo.hasMany(models.GiayToDinhKem, {
-      foreignKey: 'maLoai',
+
+  NganhHoc.associate = (models) => {
+    NganhHoc.hasMany(models.KetQuaXetTuyen, {
+      foreignKey: 'maNganh',
+      as: 'ketQuaXetTuyens',
     });
   };
-  return LoaiGiayTo;
+
+  return NganhHoc;
 };
