@@ -1,5 +1,8 @@
 'use strict';
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({
+    path: path.join(__dirname, '.env')
+});
 require('./config/mailer');
 // Các đoạn code khởi tạo Express app ở bên dưới...
 const express = require('express');
