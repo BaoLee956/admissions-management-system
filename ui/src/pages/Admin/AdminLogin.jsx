@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const   InternalLogin = () => {
+const AdminLogin = () => {
 
   const navigate = useNavigate();
 
@@ -22,14 +22,14 @@ const   InternalLogin = () => {
 
     // Demo login
     if (
-      form.email === "officer@ptit.edu.vn" &&
+      form.email === "admin@ptit.edu.vn" &&
       form.password === "123456"
     ) {
 
       alert("Đăng nhập thành công!");
 
       // Sau login -> sang màn xét tuyển
-      navigate("/officer-dashboard");
+      navigate("/admin-dashboard");
 
     } else {
 
@@ -233,7 +233,7 @@ const   InternalLogin = () => {
             Demo Account
           </p>
 
-          <p>Email: officer@ptit.edu.vn</p>
+          <p>Email: admin@ptit.edu.vn</p>
 
           <p>Password: 123456</p>
 
@@ -256,4 +256,4 @@ const   InternalLogin = () => {
   );
 };
 
-export default InternalLogin;
+export default AdminLogin;
