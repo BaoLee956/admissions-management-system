@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { authApi } from "../../services/auth.api";
+import useAuthStore from "../../store/useAuthStore";
 
-const   InternalLogin = () => {
-
+const InternalLogin = () => {
   const navigate = useNavigate();
+  const { login } = useAuthStore();
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const [form, setForm] = useState({
     email: "",
@@ -17,24 +21,41 @@ const   InternalLogin = () => {
     });
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setErrorMsg("");
+    setLoading(true);
 
-    // Demo login
-    if (
-      form.email === "officer@ptit.edu.vn" &&
-      form.password === "123456"
-    ) {
+    try {
+      const res = await authApi.internalLogin({
+        email: form.email,
+        password: form.password,
+      });
 
-      alert("Đăng nhập thành công!");
+      if (res.success && res.token) {
+        // Save to Zustand auth store
+        login({ ...res.user, role: res.role }, res.token);
+        
+        alert("Đăng nhập thành công!");
 
-      // Sau login -> sang màn xét tuyển
-      navigate("/officer-dashboard");
-
-    } else {
-
-      alert("Sai tài khoản hoặc mật khẩu!");
-
+        if (res.role === "ADMIN") {
+          navigate("/admin-dashboard");
+        } else if (res.role === "OFFICER") {
+          navigate("/officer-dashboard");
+        } else {
+          navigate("/");
+        }
+      } else {
+        setErrorMsg("Đăng nhập thất bại. Vui lòng thử lại!");
+        alert("Đăng nhập thất bại. Vui lòng thử lại!");
+      }
+    } catch (error) {
+      console.error(error);
+      const message = error.response?.data?.error?.message || "Sai tài khoản hoặc mật khẩu!";
+      setErrorMsg(message);
+      alert(message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -229,13 +250,12 @@ const   InternalLogin = () => {
           "
         >
 
-          <p className="font-semibold mb-1">
-            Demo Account
+          <p className="font-semibold mb-2">
+            Demo Accounts
           </p>
 
-          <p>Email: officer@ptit.edu.vn</p>
-
-          <p>Password: 123456</p>
+          <p><strong>Admin:</strong> admin@ptit.edu.vn / 123456</p>
+          <p className="mt-1"><strong>Officer:</strong> officer@ptit.edu.vn / 123456</p>
 
         </div>
 

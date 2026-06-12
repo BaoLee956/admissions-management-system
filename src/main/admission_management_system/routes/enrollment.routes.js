@@ -3,7 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const enrollmentController = require('../controllers/enrollment.controller');
-const { verifyToken } = require('../middlewares/auth.middleware');
+const { verifyToken, authorizeRoles } = require('../middlewares/auth.middleware');
 
 // 1. Import object cấu hình multer (Đổi tên thành upload cho dễ hiểu)
 const upload = require('../middlewares/upload.middleware');
@@ -16,7 +16,7 @@ const uploadFields = upload.fields([
   { name: 'minhChungUuTien', maxCount: 1 }
 ]);
 
-// 3. Truyền biến uploadFields (lúc này đã là 1 function) vào route
-router.post('/upload', verifyToken, uploadFields, enrollmentController.submitDocuments);
+// 3. Chỉ CANDIDATE mới được upload hồ sơ; controller sẽ dùng req.user.sbd để xác định hồ sơ của ai
+router.post('/upload', verifyToken, authorizeRoles(['CANDIDATE']), uploadFields, enrollmentController.submitDocuments);
 
 module.exports = router;

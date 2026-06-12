@@ -6,7 +6,7 @@ const OfficerSidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
 
   const isActive = (path) => {
     return location.pathname === path;
@@ -29,10 +29,9 @@ const OfficerSidebar = () => {
   `;
 
   const handleLogout = () => {
-
+    logout();
     localStorage.removeItem("user");
-
-    navigate("/officer");
+    navigate("/login");
   };
 
   return (

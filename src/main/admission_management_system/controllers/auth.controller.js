@@ -68,13 +68,25 @@ module.exports = {
       // Xóa OTP khỏi RAM để tránh dùng lại
       otpStorage.delete(keyToFind);
 
-      // Tạo Token JWT
-      const jwt = require('jsonwebtoken');
-      const token = jwt.sign({ sbd: sbd }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      // Lấy thông tin thí sinh để đưa vào payload
+      const { ThiSinh } = require('../models');
+      const thiSinh = await ThiSinh.findOne({ where: { sbd } });
+
+      const token = authService.generateToken({
+        sbd: sbd,
+        cccd: thiSinh ? thiSinh.cccd : null,
+        hoTen: thiSinh ? thiSinh.hoTen : null,
+        role: 'CANDIDATE',
+      });
 
       return res.status(200).json({
         status: 'success',
         token: token,
+        user: {
+          sbd: sbd,
+          hoTen: thiSinh ? thiSinh.hoTen : null,
+          role: 'CANDIDATE',
+        },
       });
     } catch (error) {
       console.error(error);
@@ -84,5 +96,57 @@ module.exports = {
 
   async verifyOTP(req, res) {
     return this.verifyOtp(req, res);
+  },
+
+  async internalLogin(req, res) {
+    try {
+      const email = req.body.email ? String(req.body.email).trim() : '';
+      const password = req.body.password ? String(req.body.password).trim() : '';
+
+      if (!email || !password) {
+        return res.status(400).json({ error: { message: 'Vui lòng cung cấp email và mật khẩu' } });
+      }
+
+      const { NhanVien, NhomQuyen } = require('../models');
+      const nhanVien = await NhanVien.findOne({
+        where: { email, trangThai: true },
+        include: [{
+          model: NhomQuyen,
+          as: 'nhomQuyen'
+        }]
+      });
+
+      if (!nhanVien) {
+        return res.status(401).json({ error: { message: 'Email hoặc mật khẩu không chính xác' } });
+      }
+
+      if (nhanVien.matKhau !== password) {
+        return res.status(401).json({ error: { message: 'Email hoặc mật khẩu không chính xác' } });
+      }
+
+      // Convert role to uppercase (e.g. ADMIN, OFFICER) for authorization compatibility
+      const role = nhanVien.nhomQuyen ? nhanVien.nhomQuyen.tenNhom.toUpperCase() : '';
+
+      const token = authService.generateToken({
+        maNhanVien: nhanVien.maNhanVien,
+        email: nhanVien.email,
+        hoTen: nhanVien.hoTen,
+        role: role
+      });
+
+      return res.status(200).json({
+        success: true,
+        token,
+        role,
+        user: {
+          maNhanVien: nhanVien.maNhanVien,
+          email: nhanVien.email,
+          hoTen: nhanVien.hoTen
+        }
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: { message: 'Lỗi máy chủ khi đăng nhập' } });
+    }
   }
 };

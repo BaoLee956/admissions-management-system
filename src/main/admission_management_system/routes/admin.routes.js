@@ -3,6 +3,10 @@
 const express = require('express');
 const router = express.Router();
 const AdminController = require('../controllers/admin.controller');
+const { verifyToken, authorizeRoles } = require('../middlewares/auth.middleware');
+
+// Bảo vệ toàn bộ admin routes: phải đăng nhập và phải có role ADMIN
+router.use(verifyToken, authorizeRoles(['ADMIN']));
 
 // NGANH
 router.post('/nganh', AdminController.createNganh);

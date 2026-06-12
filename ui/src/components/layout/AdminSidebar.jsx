@@ -1,10 +1,10 @@
 import { useNavigate, useLocation } from "react-router-dom";
+import useAuthStore from "../../store/useAuthStore";
 
 const AdminSidebar = () => {
-
   const navigate = useNavigate();
-
   const location = useLocation();
+  const { user, logout } = useAuthStore();
 
   const menus = [
     {
@@ -34,10 +34,9 @@ const AdminSidebar = () => {
   ];
 
   const handleLogout = () => {
-
+    logout();
     localStorage.removeItem("user");
-
-    navigate("/admin");
+    navigate("/login");
   };
 
   return (
@@ -145,18 +144,18 @@ const AdminSidebar = () => {
               text-lg
             "
           >
-            A
+            {(user?.hoTen || user?.name || "A")[0].toUpperCase()}
           </div>
 
           {/* INFO */}
           <div>
 
             <p className="font-semibold">
-              Nguyễn Văn A
+              {user?.hoTen || user?.name || "Nguyễn Văn A"}
             </p>
 
             <p className="text-sm text-gray-400">
-              Admin
+              {user?.email || "admin@ptit.edu.vn"}
             </p>
 
           </div>
